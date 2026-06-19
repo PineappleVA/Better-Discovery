@@ -38,7 +38,7 @@ function timeAgo(dateStr) {
   if (m < 60) return `hace ${m} min`;
   if (h < 24) return `hace ${h} h`;
   if (d <  7) return `hace ${d} d`;
-  return new Date(dateStr).toLocaleDateString();
+  return new Date(dateStr).toLocaleDateString('es');
 }
 
 function formatDate(dateStr) {

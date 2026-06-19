@@ -139,7 +139,7 @@
 
           <!-- List -->
           <div class="comments-list" id="commentsList">
-            <div class="no-comments">Aún no hay comentarios. ¡Sé la primera persona!</div>
+            <div class="no-comments">Aún no hay comentarios. ¡Escribe el primero!</div>
           </div>
 
           <!-- New comment form -->
@@ -240,7 +240,7 @@
     function renderComments(comments) {
       const list = document.getElementById('commentsList');
       if (!comments.length) {
-        list.innerHTML = '<div class="no-comments">Aún no hay comentarios. ¡Sé la primera persona!</div>';
+        list.innerHTML = '<div class="no-comments">Aún no hay comentarios. ¡Escribe el primero!</div>';
         return;
       }
       list.innerHTML = comments.map(c => `
