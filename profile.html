@@ -318,9 +318,13 @@
       list.innerHTML = authors.map(author => `
         <span class="chip">
           ${escapeHtml(author)}
-          <button type="button" onclick='removeFollow(${JSON.stringify(author)})'>×</button>
+          <button type="button" data-author="${escapeHtml(author)}">×</button>
         </span>
       `).join('');
+
+      list.querySelectorAll('button[data-author]').forEach(button => {
+        button.addEventListener('click', () => removeFollow(button.dataset.author || ''));
+      });
     }
 
     function updateUsage(snippets) {

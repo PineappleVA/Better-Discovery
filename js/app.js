@@ -10,6 +10,7 @@ const PROFILE_PAGE = 'profile.html';
 const PROFILE_STORAGE_KEY = 'bd_profile';
 const FOLLOW_STORAGE_KEY = 'bd_followed_authors';
 const OWNED_SNIPPETS_STORAGE_KEY = 'bd_owned_snippets';
+const textEncoder = new TextEncoder();
 
 if (IS_CONFIGURED) {
   supabaseClient = window.supabase.createClient(
@@ -210,7 +211,7 @@ function toggleFollowAuthor(author) {
 }
 
 function snippetBytes(snippet) {
-  return new TextEncoder().encode(String(snippet?.html_content || '')).length;
+  return textEncoder.encode(String(snippet?.html_content || '')).length;
 }
 
 /* ── Likes (stored in localStorage) ── */
