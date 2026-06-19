@@ -6,7 +6,7 @@
 // ============================================================
 
 const SUPABASE_URL      = 'https://YOUR_PROJECT_ID.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uZmdwcG9qYW5mYWdkY2N2cmN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NzA5NjMsImV4cCI6MjA5NzQ0Njk2M30.U93p34ZfBnHND0Xozj-9o2DzrAmvypb053P7274f7cg';
 
 // Detecta automáticamente si las credenciales fueron completadas
 const IS_CONFIGURED =
