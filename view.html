@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Creation – Better Discovery</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Full-page view: iframe on left, sidebar on right */
+    body { overflow-x: hidden; }
+
+    #loadingScreen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: calc(100vh - 60px);
+      flex-direction: column;
+      gap: 16px;
+      color: var(--text-muted);
+    }
+
+    #errorScreen {
+      display: none;
+      text-align: center;
+      padding: 80px 24px;
+      color: var(--text-muted);
+    }
+
+    #mainContent { display: none; }
+
+    .tag-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.73rem;
+      background: rgba(99,102,241,0.15);
+      color: var(--accent);
+      border: 1px solid rgba(99,102,241,0.3);
+    }
+
+    .no-comments {
+      color: var(--text-muted);
+      font-size: 0.83rem;
+      text-align: center;
+      padding: 16px 0;
+    }
+
+    /* Fullscreen button */
+    .fs-btn {
+      width: 100%;
+      padding: 9px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, color 0.15s;
+      margin-top: 8px;
+    }
+    .fs-btn:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="index.html" class="nav-logo">🚀 Better Discovery</a>
+    <div class="nav-links">
+      <a href="index.html">← Browse</a>
+      <a href="about.html">About</a>
+      <a href="upload.html" class="btn btn-primary">+ Upload</a>
+    </div>
+  </nav>
+
+  <!-- Loading -->
+  <div id="loadingScreen">
+    <div class="spinner" style="margin:0"></div>
+    <span>Loading creation…</span>
+  </div>
+
+  <!-- Error -->
+  <div id="errorScreen">
+    <div style="font-size:3rem;margin-bottom:16px">😕</div>
+    <h2 id="errorTitle" style="margin-bottom:8px">Creation not found</h2>
+    <p id="errorMsg" style="max-width:400px;margin:0 auto 24px">This creation may have been removed or the link is invalid.</p>
+    <a href="index.html" class="btn btn-primary">← Browse all</a>
+  </div>
+
+  <!-- Main content (shown after load) -->
+  <div id="mainContent">
+    <div class="view-layout">
+
+      <!-- iframe preview -->
+      <div class="preview-wrap">
+        <!-- Sandbox: allow-scripts without allow-same-origin keeps iframe in a null origin,
+             preventing access to the host page's cookies, localStorage and DOM.
+             allow-forms/modals/popups enable common HTML patterns without escalation. -->
+        <iframe id="previewFrame"
+                sandbox="allow-scripts allow-forms allow-modals allow-popups"
+                title="HTML preview"
+                allowfullscreen></iframe>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="view-sidebar">
+
+        <!-- Info panel -->
+        <div class="panel">
+          <div class="panel-label">Creation</div>
+          <h1 class="view-title" id="snippetTitle">—</h1>
+          <p  class="view-desc"  id="snippetDesc"></p>
+          <div class="view-meta">
+            <span>👤 <span id="snippetAuthor">—</span></span>
+            <span>📅 <span id="snippetDate">—</span></span>
+            <span id="snippetTagWrap" style="display:none">🏷️ <span class="tag-badge" id="snippetTag"></span></span>
+          </div>
+        </div>
+
+        <!-- Like + actions panel -->
+        <div class="panel">
+          <div class="panel-label">Actions</div>
+          <button class="like-btn" id="likeBtn" onclick="handleLike()">
+            <span id="likeIcon">❤️</span>
+            <span id="likeLabel">Like</span>
+            <strong id="likeCount">0</strong>
+          </button>
+          <button class="copy-btn" onclick="copyHtml()">📋 Copy HTML source</button>
+          <button class="fs-btn" onclick="openFullscreen()">⛶ Open in full screen</button>
+        </div>
+
+        <!-- Comments panel -->
+        <div class="panel" style="flex:1">
+          <div class="panel-label">Comments</div>
+
+          <!-- List -->
+          <div class="comments-list" id="commentsList">
+            <div class="no-comments">No comments yet. Be the first!</div>
+          </div>
+
+          <!-- New comment form -->
+          <div class="comment-form" id="commentForm">
+            <input id="commentAuthor" type="text" maxlength="60" placeholder="Your name (optional)">
+            <textarea id="commentText" maxlength="1000" rows="3" placeholder="Write a comment…"></textarea>
+            <button class="btn btn-primary" onclick="submitComment()" style="width:100%;justify-content:center">
+              💬 Post comment
+            </button>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    /* ── Get snippet ID from URL ── */
+    const params      = new URLSearchParams(window.location.search);
+    const snippetId   = params.get('id');
+    let   snippetData = null;
+
+    /* ── Load snippet ── */
+    async function loadSnippet() {
+      if (!snippetId) { showError('No ID provided', 'Add ?id=<snippet-id> to the URL.'); return; }
+
+      if (!IS_CONFIGURED) {
+        showError('Supabase not configured', 'Open js/config.js and add your credentials. See the About page for details.');
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('snippets')
+          .select('*')
+          .eq('id', snippetId)
+          .single();
+
+        if (error || !data) throw error || new Error('Not found');
+
+        snippetData = data;
+        renderSnippet(data);
+        loadComments();
+
+      } catch (err) {
+        showError('Creation not found', err.message);
+      }
+    }
+
+    function renderSnippet(s) {
+      document.title = `${s.title} – Better Discovery`;
+
+      document.getElementById('snippetTitle').textContent  = s.title;
+      document.getElementById('snippetDesc').textContent   = s.description || '';
+      document.getElementById('snippetAuthor').textContent = s.author || 'Anonymous';
+      document.getElementById('snippetDate').textContent   = formatDate(s.created_at);
+
+      if (s.tag) {
+        document.getElementById('snippetTag').textContent     = s.tag;
+        document.getElementById('snippetTagWrap').style.display = '';
+      }
+
+      /* Update like button */
+      const liked = isLiked(s.id);
+      document.getElementById('likeCount').textContent = s.likes ?? 0;
+      if (liked) document.getElementById('likeBtn').classList.add('liked');
+
+      /* Set iframe content */
+      document.getElementById('previewFrame').srcdoc = s.html_content;
+
+      /* Show main content */
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('mainContent').style.display   = '';
+    }
+
+    /* ── Comments ── */
+    async function loadComments() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('comments')
+          .select('id, author, content, created_at')
+          .eq('snippet_id', snippetId)
+          .order('created_at', { ascending: true });
+
+        if (error) throw error;
+        renderComments(data || []);
+      } catch {
+        /* silently ignore comment load errors */
+      }
+    }
+
+    function renderComments(comments) {
+      const list = document.getElementById('commentsList');
+      if (!comments.length) {
+        list.innerHTML = '<div class="no-comments">No comments yet. Be the first!</div>';
+        return;
+      }
+      list.innerHTML = comments.map(c => `
+        <div class="comment">
+          <div class="comment-author">${escapeHtml(c.author || 'Anonymous')}</div>
+          <div class="comment-body">${escapeHtml(c.content)}</div>
+          <div class="comment-time">${timeAgo(c.created_at)}</div>
+        </div>`).join('');
+      /* Scroll to bottom of comment list */
+      list.scrollTop = list.scrollHeight;
+    }
+
+    async function submitComment() {
+      const author  = document.getElementById('commentAuthor').value.trim() || 'Anonymous';
+      const content = document.getElementById('commentText').value.trim();
+
+      if (!content) { showToast('Comment cannot be empty.', 'error'); return; }
+      if (!IS_CONFIGURED) { showToast('Supabase not configured.', 'error'); return; }
+
+      const btn = document.querySelector('.comment-form .btn');
+      btn.disabled    = true;
+      btn.textContent = '⏳ Posting…';
+
+      try {
+        const { error } = await supabaseClient
+          .from('comments')
+          .insert([{ snippet_id: snippetId, author, content }]);
+
+        if (error) throw error;
+
+        document.getElementById('commentText').value = '';
+        showToast('Comment posted!', 'success');
+        loadComments();
+
+      } catch (err) {
+        showToast(`Error: ${err.message}`, 'error', 5000);
+      } finally {
+        btn.disabled    = false;
+        btn.textContent = '💬 Post comment';
+      }
+    }
+
+    /* ── Likes ── */
+    async function handleLike() {
+      if (!IS_CONFIGURED || !snippetData) return;
+
+      const { nowLiked } = toggleLike(snippetId);
+      const delta        = nowLiked ? 1 : -1;
+      const newCount     = (snippetData.likes ?? 0) + delta;
+
+      snippetData.likes = newCount;
+      document.getElementById('likeCount').textContent = newCount;
+      document.getElementById('likeBtn').classList.toggle('liked', nowLiked);
+
+      try {
+        const { error } = await supabaseClient
+          .from('snippets')
+          .update({ likes: newCount })
+          .eq('id', snippetId);
+
+        if (error) throw error;
+      } catch {
+        /* Revert on failure */
+        const reverted    = newCount - delta;
+        snippetData.likes = reverted;
+        toggleLike(snippetId); // revert localStorage
+        document.getElementById('likeCount').textContent = reverted;
+        document.getElementById('likeBtn').classList.toggle('liked', !nowLiked);
+        showToast('Could not save like — please try again.', 'error');
+      }
+    }
+
+    /* ── Copy HTML ── */
+    function copyHtml() {
+      if (!snippetData) return;
+      navigator.clipboard.writeText(snippetData.html_content)
+        .then(() => showToast('HTML copied to clipboard!', 'success'))
+        .catch(() => showToast('Could not copy — try again.', 'error'));
+    }
+
+    /* ── Fullscreen ── */
+    function openFullscreen() {
+      if (!snippetData) return;
+      const blob = new Blob([snippetData.html_content], { type: 'text/html' });
+      const url  = URL.createObjectURL(blob);
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+    /* ── Error screen ── */
+    function showError(title, msg) {
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('errorScreen').style.display   = '';
+      document.getElementById('errorTitle').textContent = title;
+      document.getElementById('errorMsg').textContent   = msg;
+    }
+
+    loadSnippet();
+  </script>
+</body>
+</html>
