@@ -1,41 +1,41 @@
 # Better Discovery 🚀
 
-A community-driven HTML creation gallery hosted on **GitHub Pages** and powered by **Supabase**.
+Una galería comunitaria de creaciones HTML alojada en **GitHub Pages** y conectada a **Supabase**.
 
-Upload up to **1 MB** of HTML code, let others view it live in a sandboxed preview, and interact through **likes** and **comments** — no programming knowledge needed to enjoy the creations.
+Sube hasta **1 MB** de código HTML para que otras personas lo vean en una vista previa con sandbox y puedan interactuar con **likes** y **comentarios**.
 
 ---
 
-## ✨ Features
+## ✨ Funciones
 
-| Feature | Description |
+| Función | Descripción |
 |---|---|
-| 📤 Upload HTML | Paste up to 1 MB of HTML and publish in one click |
-| 🖥️ Live Preview | Sandboxed iframe runs the HTML exactly as intended |
-| ❤️ Likes | One-click like system persisted to Supabase |
-| 💬 Comments | Leave feedback and read others' thoughts |
-| 🔍 Search | Instant search by title or description |
-| 📄 Sort | Sort by newest or most liked |
-| 📱 Responsive | Works on desktop and mobile |
+| 📤 Subir HTML | Pega hasta 1 MB de HTML y publícalo con un clic |
+| 🖥️ Vista previa en vivo | Un iframe con sandbox ejecuta el HTML de forma segura |
+| ❤️ Me gusta | Sistema de likes persistido en Supabase |
+| 💬 Comentarios | Deja feedback y lee opiniones de otras personas |
+| 🔍 Búsqueda | Búsqueda instantánea por título o descripción |
+| 📄 Ordenado | Ordena por más recientes o más valorados |
+| 📱 Responsive | Funciona en escritorio y móvil |
 
-## 📄 Pages
+## 📄 Páginas
 
-- **`index.html`** — Browse & discover all HTML creations
-- **`upload.html`** — Upload a new HTML creation (up to 1 MB)
-- **`view.html?id=…`** — View, like and comment on a specific creation
-- **`about.html`** — Feature overview and full setup guide
+- **`index.html`** — Explora y descubre todas las creaciones HTML
+- **`upload.html`** — Sube una nueva creación HTML (hasta 1 MB)
+- **`view.html?id=…`** — Visualiza, da like y comenta una creación específica
+- **`about.html`** — Resumen de funciones y guía completa de configuración
 
 ---
 
-## ⚙️ Setup
+## ⚙️ Configuración
 
-### 1 — Create a Supabase project
+### 1 — Crea un proyecto en Supabase
 
-Sign up for free at [supabase.com](https://supabase.com) and create a new project.
+Regístrate gratis en [supabase.com](https://supabase.com) y crea un proyecto nuevo.
 
-### 2 — Run the SQL schema
+### 2 — Ejecuta el esquema SQL
 
-In your Supabase dashboard → **SQL Editor → New query**, paste and run:
+En el panel de Supabase → **SQL Editor → New query**, pega y ejecuta:
 
 ```sql
 CREATE TABLE IF NOT EXISTS snippets (
@@ -69,33 +69,33 @@ CREATE POLICY "Public read comments"   ON comments FOR SELECT USING (true);
 CREATE POLICY "Public insert comments" ON comments FOR INSERT WITH CHECK (true);
 ```
 
-### 3 — Add your credentials
+### 3 — Añade tus credenciales
 
-Open **`js/config.js`** and replace the placeholder values:
+Abre **`js/config.js`** y reemplaza los valores de ejemplo:
 
 ```js
 const SUPABASE_URL      = 'https://YOUR_PROJECT_ID.supabase.co';
 const SUPABASE_ANON_KEY = 'YOUR_ANON_PUBLIC_KEY';
 ```
 
-Both values are found in **Project Settings → API** in your Supabase dashboard.
+Ambos valores están en **Project Settings → API** dentro de Supabase.
 
-### 4 — Deploy to GitHub Pages
+### 4 — Despliega en GitHub Pages
 
-Push to GitHub, then go to **Settings → Pages**, set the source to your `main` branch (root folder) and save. The site will be live at `https://<username>.github.io/<repo>`.
+Haz push a GitHub y luego ve a **Settings → Pages**, define como origen la rama `main` (carpeta raíz) y guarda. El sitio quedará activo en `https://<usuario>.github.io/<repo>`.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Stack técnico
 
-- Pure HTML / CSS / JavaScript (no build step needed)
+- HTML / CSS / JavaScript puro (sin paso de build)
 - [Supabase JS v2](https://supabase.com/docs/reference/javascript) via CDN
-- GitHub Pages for free static hosting
+- GitHub Pages para hosting estático gratuito
 
-## 🔒 Security
+## 🔒 Seguridad
 
-All uploaded HTML runs inside an `<iframe>` with a restricted `sandbox` attribute (`allow-scripts allow-forms allow-modals allow-popups`). Iframes run in a **null origin** — they cannot access the host page's cookies, localStorage, or DOM.
+Todo el HTML subido se ejecuta dentro de un `<iframe>` con atributo `sandbox` restringido (`allow-scripts allow-forms allow-modals allow-popups`). Los iframes corren en **origen nulo** y no pueden acceder a cookies, localStorage ni DOM de la página principal.
 
 ---
 
-> See [about.html](about.html) for the interactive setup guide included in the site.
+> Consulta [about.html](about.html) para la guía interactiva de configuración incluida en el sitio.

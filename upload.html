@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload HTML – Better Discovery</title>
-  <meta name="description" content="Share your HTML creation with the world. Upload up to 1 MB of HTML code.">
+  <title>Subir HTML – Better Discovery</title>
+  <meta name="description" content="Comparte tu creación HTML con el mundo. Sube hasta 1 MB de código HTML.">
   <link rel="stylesheet" href="css/style.css">
   <style>
     .preview-toggle {
@@ -74,22 +74,22 @@
   <nav>
     <a href="index.html" class="nav-logo">🚀 Better Discovery</a>
     <div class="nav-links">
-      <a href="index.html">Browse</a>
-      <a href="about.html">About</a>
-      <a href="upload.html" class="btn btn-primary active">+ Upload</a>
+      <a href="index.html">Explorar</a>
+      <a href="about.html">Acerca de</a>
+      <a href="upload.html" class="btn btn-primary active">+ Subir</a>
     </div>
   </nav>
 
   <!-- Form -->
   <div class="form-page" id="formPage">
     <div class="page-header">
-      <h1 class="page-title">Upload HTML Creation</h1>
-      <p class="page-sub">Paste your HTML code (up to 1 MB). Others will be able to view and interact with it — no coding required.</p>
+      <h1 class="page-title">Sube tu creación HTML</h1>
+      <p class="page-sub">Pega tu código HTML (hasta 1 MB). Otras personas podrán verlo e interactuar con él.</p>
     </div>
 
     <div id="configWarning" style="display:none" class="config-notice" style="margin-bottom:24px">
-      ⚙️ Supabase is not configured yet. Open <code>js/config.js</code> and add your credentials, then run the SQL schema.
-      See the <a href="about.html" style="color:var(--accent)">About / Setup</a> page for instructions.
+      ⚙️ Supabase aún no está configurado. Abre <code>js/config.js</code>, añade tus credenciales y ejecuta el esquema SQL.
+      Consulta la página <a href="about.html" style="color:var(--accent)">Acerca de / Configuración</a>.
     </div>
 
     <form id="uploadForm" novalidate>
@@ -97,35 +97,35 @@
       <!-- Title -->
       <div class="form-group">
         <label class="form-label" for="title">
-          Title <span class="hint">required</span>
+          Título <span class="hint">obligatorio</span>
         </label>
         <input id="title" class="form-input" type="text" maxlength="120"
-               placeholder="My awesome HTML project" required>
+               placeholder="Mi increíble proyecto HTML" required>
       </div>
 
       <!-- Description -->
       <div class="form-group">
-        <label class="form-label" for="description">Description</label>
+        <label class="form-label" for="description">Descripción</label>
         <textarea id="description" class="form-textarea" maxlength="500" rows="3"
-                  placeholder="What does your creation do? What can visitors interact with?"></textarea>
+                  placeholder="¿Qué hace tu creación? ¿Con qué pueden interactuar los visitantes?"></textarea>
       </div>
 
       <!-- Author + optional tag -->
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label" for="author">Your name / handle</label>
-          <input id="author" class="form-input" type="text" maxlength="60" placeholder="Anonymous">
+          <label class="form-label" for="author">Tu nombre / usuario</label>
+          <input id="author" class="form-input" type="text" maxlength="60" placeholder="Anónimo">
         </div>
         <div class="form-group">
-          <label class="form-label" for="tag">Category <span class="hint">optional</span></label>
+          <label class="form-label" for="tag">Categoría <span class="hint">opcional</span></label>
           <select id="tag" class="form-input">
-            <option value="">— none —</option>
-            <option value="game">🎮 Game</option>
-            <option value="art">🎨 Art / Animation</option>
-            <option value="tool">🛠️ Tool / Utility</option>
-            <option value="demo">📐 Demo / Experiment</option>
-            <option value="interactive">🖱️ Interactive</option>
-            <option value="other">📦 Other</option>
+            <option value="">— ninguna —</option>
+            <option value="game">🎮 Juego</option>
+            <option value="art">🎨 Arte / Animación</option>
+            <option value="tool">🛠️ Herramienta / Utilidad</option>
+            <option value="demo">📐 Demo / Experimento</option>
+            <option value="interactive">🖱️ Interactivo</option>
+            <option value="other">📦 Otro</option>
           </select>
         </div>
       </div>
@@ -134,13 +134,13 @@
       <div class="form-group">
         <div class="preview-toggle">
           <label class="form-label" for="htmlCode" style="margin:0;flex:1">
-            HTML Code <span class="hint">required · max 1 MB</span>
+            Código HTML <span class="hint">obligatorio · máximo 1 MB</span>
           </label>
-          <button type="button" id="togglePreview">👁 Preview</button>
+          <button type="button" id="togglePreview">👁 Vista previa</button>
         </div>
 
         <textarea id="htmlCode" class="form-textarea code-textarea" spellcheck="false"
-                  placeholder="<!DOCTYPE html>&#10;<html>&#10;  <head><title>My Creation</title></head>&#10;  <body>&#10;    <h1>Hello World!</h1>&#10;  </body>&#10;</html>"></textarea>
+                  placeholder="<!DOCTYPE html>&#10;<html>&#10;  <head><title>Mi creación</title></head>&#10;  <body>&#10;    <h1>¡Hola mundo!</h1>&#10;  </body>&#10;</html>"></textarea>
 
         <div class="progress-bar-wrap">
           <div class="progress-bar" id="sizeBar" style="width:0%"></div>
@@ -151,13 +151,13 @@
              origin, preventing any access to the parent page's DOM/cookies/localStorage. -->
         <iframe id="livePreview"
                 sandbox="allow-scripts allow-forms allow-modals allow-popups"
-                title="Live preview"></iframe>
+                title="Vista previa en vivo"></iframe>
       </div>
 
       <!-- Actions -->
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary" id="submitBtn">🚀 Publish</button>
-        <a href="index.html" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary" id="submitBtn">🚀 Publicar</button>
+        <a href="index.html" class="btn btn-outline">Cancelar</a>
         <span id="submitStatus" style="font-size:0.85rem;color:var(--text-muted);margin-left:auto"></span>
       </div>
 
@@ -168,12 +168,12 @@
   <div id="successPage" class="form-page" style="display:none">
     <div class="upload-success">
       <div class="check">🎉</div>
-      <h2>Published!</h2>
-      <p>Your creation is live and ready to be discovered.</p>
+      <h2>¡Publicado!</h2>
+      <p>Tu creación ya está en línea y lista para ser descubierta.</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-        <a id="viewLink" href="#" class="btn btn-primary">View my creation →</a>
-        <a href="upload.html" class="btn btn-outline">Upload another</a>
-        <a href="index.html" class="btn btn-outline">Browse all</a>
+        <a id="viewLink" href="#" class="btn btn-primary">Ver mi creación →</a>
+        <a href="upload.html" class="btn btn-outline">Subir otra</a>
+        <a href="index.html" class="btn btn-outline">Explorar todo</a>
       </div>
     </div>
   </div>
@@ -206,7 +206,7 @@
       if (bytes > MAX_BYTES) {
         bar.style.background    = 'var(--danger)';
         label.className         = 'size-bar error';
-        label.textContent       = `${bytesToSize(bytes)} / 1 MB — exceeds limit!`;
+        label.textContent       = `${bytesToSize(bytes)} / 1 MB — ¡supera el límite!`;
       } else if (pct > 80) {
         bar.style.background    = '#f59e0b';
         label.className         = 'size-bar warn';
@@ -228,13 +228,13 @@
 
     function refreshPreview() {
       const code = document.getElementById('htmlCode').value;
-      previewIframe.srcdoc = code || '<p style="color:#888;font-family:sans-serif;padding:20px">Your HTML will appear here…</p>';
+      previewIframe.srcdoc = code || '<p style="color:#888;font-family:sans-serif;padding:20px">Tu HTML aparecerá aquí…</p>';
     }
 
     document.getElementById('togglePreview').addEventListener('click', () => {
       previewVisible = !previewVisible;
       previewIframe.style.display = previewVisible ? 'block' : 'none';
-      document.getElementById('togglePreview').textContent = previewVisible ? '✏️ Editor' : '👁 Preview';
+      document.getElementById('togglePreview').textContent = previewVisible ? '✏️ Editor' : '👁 Vista previa';
       if (previewVisible) refreshPreview();
     });
 
@@ -243,28 +243,28 @@
       e.preventDefault();
 
       if (!IS_CONFIGURED) {
-        showToast('Configure Supabase credentials first.', 'error');
+        showToast('Configura primero las credenciales de Supabase.', 'error');
         return;
       }
 
       const title    = document.getElementById('title').value.trim();
       const desc     = document.getElementById('description').value.trim();
-      const author   = document.getElementById('author').value.trim() || 'Anonymous';
+      const author   = document.getElementById('author').value.trim() || 'Anónimo';
       const tag      = document.getElementById('tag').value;
       const htmlCode = document.getElementById('htmlCode').value;
 
       /* Validation */
-      if (!title) { showToast('Please add a title.', 'error'); document.getElementById('title').focus(); return; }
-      if (!htmlCode.trim()) { showToast('HTML code cannot be empty.', 'error'); document.getElementById('htmlCode').focus(); return; }
+      if (!title) { showToast('Añade un título.', 'error'); document.getElementById('title').focus(); return; }
+      if (!htmlCode.trim()) { showToast('El código HTML no puede estar vacío.', 'error'); document.getElementById('htmlCode').focus(); return; }
 
       const bytes = new TextEncoder().encode(htmlCode).length;
-      if (bytes > MAX_BYTES) { showToast('HTML exceeds the 1 MB limit.', 'error'); return; }
+      if (bytes > MAX_BYTES) { showToast('El HTML supera el límite de 1 MB.', 'error'); return; }
 
       /* Submit */
       const btn    = document.getElementById('submitBtn');
       const status = document.getElementById('submitStatus');
       btn.disabled     = true;
-      btn.textContent  = '⏳ Publishing…';
+      btn.textContent  = '⏳ Publicando…';
       status.textContent = '';
 
       try {
@@ -284,7 +284,7 @@
       } catch (err) {
         showToast(`Error: ${err.message}`, 'error', 6000);
         btn.disabled    = false;
-        btn.textContent = '🚀 Publish';
+        btn.textContent = '🚀 Publicar';
         status.textContent = '';
       }
     });

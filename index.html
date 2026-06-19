@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Better Discovery – Discover HTML Creations</title>
-  <meta name="description" content="Share and discover interactive HTML creations. Upload your HTML, let others view, like and comment — no programming required.">
+  <title>Better Discovery – Descubre creaciones HTML</title>
+  <meta name="description" content="Comparte y descubre creaciones HTML interactivas. Sube tu HTML y deja que otros lo vean, den like y comenten.">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -13,17 +13,17 @@
   <nav>
     <a href="index.html" class="nav-logo">🚀 Better Discovery</a>
     <div class="nav-links">
-      <a href="index.html" class="active">Browse</a>
-      <a href="about.html">About</a>
-      <a href="upload.html" class="btn btn-primary">+ Upload</a>
+      <a href="index.html" class="active">Explorar</a>
+      <a href="about.html">Acerca de</a>
+      <a href="upload.html" class="btn btn-primary">+ Subir</a>
     </div>
   </nav>
 
   <!-- ── Hero ── -->
   <section class="hero">
-    <h1>Discover HTML Creations</h1>
-    <p>Upload your HTML projects and let anyone view, interact, like and comment — no coding needed.</p>
-    <a href="upload.html" class="btn btn-primary" style="font-size:1rem;padding:12px 30px;">Share Your HTML ✨</a>
+    <h1>Descubre creaciones HTML</h1>
+    <p>Sube tus proyectos HTML y deja que cualquiera los vea, interactúe, reaccione y comente — sin programar.</p>
+    <a href="upload.html" class="btn btn-primary" style="font-size:1rem;padding:12px 30px;">Comparte tu HTML ✨</a>
   </section>
 
   <!-- ── Main content ── -->
@@ -35,21 +35,21 @@
            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
       </svg>
-      <input id="searchInput" type="search" placeholder="Search creations by title or description…" autocomplete="off">
+      <input id="searchInput" type="search" placeholder="Busca por título o descripción…" autocomplete="off">
     </div>
 
     <!-- Section header -->
     <div class="section-header">
-      <h2 class="section-title">✨ Latest Creations</h2>
-      <select id="sortSelect" class="sort-select" aria-label="Sort by">
-        <option value="created_at">Newest first</option>
-        <option value="likes">Most liked</option>
+      <h2 class="section-title">✨ Últimas creaciones</h2>
+      <select id="sortSelect" class="sort-select" aria-label="Ordenar por">
+        <option value="created_at">Más recientes</option>
+        <option value="likes">Más valoradas</option>
       </select>
     </div>
 
     <!-- Grid -->
     <div id="grid" class="snippets-grid">
-      <div class="loading"><div class="spinner"></div>Loading…</div>
+      <div class="loading"><div class="spinner"></div>Cargando…</div>
     </div>
 
     <!-- Pagination -->
@@ -69,15 +69,19 @@
     let sort  = 'created_at';
 
     /* ── Render a card ── */
-    function renderCard(s) {
+    function renderCard(s, idx) {
+      const author = s.author || 'Anónimo';
       return `
-        <a href="view.html?id=${encodeURIComponent(s.id)}" class="snippet-card">
+        <a href="view.html?id=${encodeURIComponent(s.id)}" class="snippet-card reveal" style="--i:${idx % 8}">
           <div class="card-thumb">🌐</div>
           <div class="card-body">
             <div class="card-title">${escapeHtml(s.title)}</div>
-            <div class="card-desc">${escapeHtml(s.description || 'No description provided.')}</div>
+            <div class="card-desc">${escapeHtml(s.description || 'Sin descripción por ahora.')}</div>
             <div class="card-footer">
-              <span class="card-author">by ${escapeHtml(s.author || 'Anonymous')}</span>
+              <span class="card-author">
+                <span class="profile-dot">${escapeHtml(getProfileInitial(author))}</span>
+                ${escapeHtml(author)}
+              </span>
               <div class="card-stats">
                 <span>❤️ ${s.likes ?? 0}</span>
                 <span>🕐 ${timeAgo(s.created_at)}</span>
@@ -90,7 +94,7 @@
     /* ── Load snippets ── */
     async function loadSnippets() {
       const grid = document.getElementById('grid');
-      grid.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+      grid.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando…</div>';
 
       if (!supabaseClient) {
         grid.innerHTML = configNoticeHtml();
@@ -118,22 +122,22 @@
           grid.innerHTML = `
             <div class="empty-state">
               <div style="font-size:3rem;margin-bottom:14px">🎨</div>
-              <h3>${query ? 'No results found' : 'No creations yet'}</h3>
-              <p>${query ? 'Try a different search term.' : 'Be the first to share something!'}</p>
-              <a href="upload.html" class="btn btn-primary" style="margin-top:18px;display:inline-flex">+ Upload HTML</a>
+              <h3>${query ? 'No se encontraron resultados' : 'Aún no hay creaciones'}</h3>
+              <p>${query ? 'Prueba con otra búsqueda.' : '¡Sé la primera persona en compartir algo!'}</p>
+              <a href="upload.html" class="btn btn-primary" style="margin-top:18px;display:inline-flex">+ Subir HTML</a>
             </div>`;
           document.getElementById('pagination').innerHTML = '';
           return;
         }
 
-        grid.innerHTML = data.map(renderCard).join('');
+        grid.innerHTML = data.map((item, idx) => renderCard(item, idx)).join('');
         renderPagination();
 
       } catch (err) {
         grid.innerHTML = `
           <div class="empty-state">
             <div style="font-size:2.5rem;margin-bottom:12px">⚠️</div>
-            <h3>Something went wrong</h3>
+            <h3>Algo salió mal</h3>
             <p style="max-width:360px;margin:0 auto">${escapeHtml(err.message)}</p>
           </div>`;
       }
@@ -146,7 +150,7 @@
       if (pages <= 1) { el.innerHTML = ''; return; }
 
       const parts = [];
-      if (page > 0) parts.push(`<button class="page-btn" onclick="goPage(${page - 1})">← Prev</button>`);
+      if (page > 0) parts.push(`<button class="page-btn" onclick="goPage(${page - 1})">← Anterior</button>`);
 
       const start = Math.max(0, page - 2);
       const end   = Math.min(pages - 1, page + 2);
@@ -157,7 +161,7 @@
       }
 
       if (end < pages - 1) parts.push(`<span style="color:var(--text-muted);padding:0 4px">…</span><button class="page-btn" onclick="goPage(${pages - 1})">${pages}</button>`);
-      if (page < pages - 1) parts.push(`<button class="page-btn" onclick="goPage(${page + 1})">Next →</button>`);
+      if (page < pages - 1) parts.push(`<button class="page-btn" onclick="goPage(${page + 1})">Siguiente →</button>`);
 
       el.innerHTML = parts.join('');
     }
