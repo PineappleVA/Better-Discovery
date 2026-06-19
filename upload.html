@@ -78,6 +78,7 @@
       <a href="about.html">Acerca de</a>
       <a href="upload.html" class="btn btn-primary active">+ Subir</a>
     </div>
+    <div class="nav-auth" id="navAuth"></div>
   </nav>
 
   <!-- Form -->
@@ -288,6 +289,13 @@
         status.textContent = '';
       }
     });
+
+    async function initPage() {
+      if (!(await requireAuth())) return;
+      await renderAuthNav();
+    }
+
+    document.addEventListener('DOMContentLoaded', initPage);
   </script>
 </body>
 </html>

@@ -5,12 +5,61 @@
 /* ── Supabase client ── */
 let supabaseClient = null;
 const DEFAULT_AUTHOR_NAME = 'Anónimo';
+const LOGIN_PAGE = 'login.html';
 
 if (IS_CONFIGURED) {
   supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
+}
+
+function isLoginPage() {
+  return window.location.pathname.endsWith('/login.html') ||
+         window.location.pathname.endsWith('/login');
+}
+
+async function getSession() {
+  if (!supabaseClient) return null;
+  const { data } = await supabaseClient.auth.getSession();
+  return data?.session ?? null;
+}
+
+async function requireAuth() {
+  if (isLoginPage()) return true;
+  const session = await getSession();
+  if (!session) {
+    window.location.replace(LOGIN_PAGE);
+    return false;
+  }
+  return true;
+}
+
+async function renderAuthNav() {
+  const navAuth = document.getElementById('navAuth');
+  if (!navAuth) return;
+
+  if (!supabaseClient) {
+    navAuth.innerHTML = '';
+    return;
+  }
+
+  const session = await getSession();
+  if (!session) {
+    navAuth.innerHTML = `<a href="${LOGIN_PAGE}" class="btn btn-primary">Login</a>`;
+    return;
+  }
+
+  const email = session.user?.email || DEFAULT_AUTHOR_NAME;
+  navAuth.innerHTML = `
+    <span class="user-label">${escapeHtml(email)}</span>
+    <button type="button" class="btn btn-outline" id="logoutBtn">Salir</button>
+  `;
+
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.replace(LOGIN_PAGE);
+  });
 }
 
 /* ── Toast notifications ── */
@@ -104,9 +153,8 @@ function toggleLike(id) {
 function configNoticeHtml() {
   return `
     <div class="config-notice">
-      <strong>⚙️ Debes configurar Supabase</strong><br><br>
-      Abre <code>js/config.js</code> y completa las líneas 11 y 12 con la URL
-      de tu proyecto y tu clave pública (anon).<br>
-      ¿Necesitas ayuda? Visita <a href="about.html" style="color:var(--accent)">Acerca de&nbsp;/ Configuración</a>.
+      <strong>⚙️ No se pudo iniciar Supabase</strong><br><br>
+      Revisa <code>js/config.js</code> y vuelve a cargar la página.<br>
+      Si estás en login, intenta entrar de nuevo.
     </div>`;
 }

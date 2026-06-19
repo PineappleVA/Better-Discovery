@@ -72,6 +72,7 @@
       <a href="about.html">Acerca de</a>
       <a href="upload.html" class="btn btn-primary">+ Subir</a>
     </div>
+    <div class="nav-auth" id="navAuth"></div>
   </nav>
 
   <!-- Loading -->
@@ -339,7 +340,13 @@
       document.getElementById('errorMsg').textContent   = msg;
     }
 
-    loadSnippet();
+    async function initPage() {
+      if (!(await requireAuth())) return;
+      await renderAuthNav();
+      loadSnippet();
+    }
+
+    document.addEventListener('DOMContentLoaded', initPage);
   </script>
 </body>
 </html>

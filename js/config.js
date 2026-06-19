@@ -1,15 +1,12 @@
 // ============================================================
 // Better Discovery – Configuración de Supabase
 // ============================================================
-// 1. Crea un proyecto GRATIS en https://supabase.com
-// 2. Ve a Project Settings → API
-// 3. Pega aquí la URL de tu proyecto y tu clave anon/pública
-// 4. Ejecuta el esquema SQL en el editor SQL de Supabase
-//    (revisa about.html o README.md para el esquema completo)
+// Configuración del proyecto Better Discovery
+// Si cambias de proyecto, actualiza estas dos constantes.
 // ============================================================
 
-const SUPABASE_URL      = 'https://YOUR_PROJECT_ID.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_PUBLIC_KEY';
+const SUPABASE_URL      = 'https://onfgppojanfagdccvrcy.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_Uz6Dfl_CKXgF6nByIp50qg_O6rcbVPz';
 
 // Detecta automáticamente si las credenciales fueron completadas
 const IS_CONFIGURED =

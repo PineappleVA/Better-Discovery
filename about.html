@@ -17,6 +17,7 @@
       <a href="about.html" class="active">Acerca de</a>
       <a href="upload.html" class="btn btn-primary">+ Subir</a>
     </div>
+    <div class="nav-auth" id="navAuth"></div>
   </nav>
 
   <div class="about-page">
@@ -63,100 +64,11 @@
       </div>
     </div>
 
-    <!-- Setup guide -->
-    <h2>⚙️ Guía de configuración (Supabase)</h2>
+    <h2>🔐 Acceso</h2>
     <p>
-      Better Discovery es un <strong style="color:var(--text-primary)">sitio estático</strong> que usa
-      <a href="https://supabase.com" target="_blank" rel="noopener" style="color:var(--accent)">Supabase</a>
-      como backend. Necesitas un proyecto gratuito de Supabase para que funcione por completo.
+      Usa la pantalla de <a href="login.html" style="color:var(--accent)">Login</a> para entrar con tu cuenta
+      y luego explora, sube y comenta creaciones.
     </p>
-
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-body">
-        <h3>Crea un proyecto gratuito de Supabase</h3>
-        <p>Ve a <a href="https://supabase.com" target="_blank" rel="noopener">supabase.com</a>,
-           regístrate (es gratis) y crea un proyecto nuevo. Espera a que termine de aprovisionarse.</p>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-body">
-        <h3>Ejecuta el esquema SQL</h3>
-        <p>
-          En el panel de Supabase, ve a <strong>SQL Editor → New query</strong>,
-          pega el bloque de abajo y haz clic en <strong>Run</strong>.
-        </p>
-      </div>
-    </div>
-
-<div class="code-block">-- Better Discovery — database schema
-
-CREATE TABLE IF NOT EXISTS snippets (
-  id           UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
-  title        TEXT        NOT NULL,
-  description  TEXT        NOT NULL DEFAULT '',
-  html_content TEXT        NOT NULL,
-  author       TEXT        NOT NULL DEFAULT 'Anonymous',
-  tag          TEXT,
-  likes        INTEGER     NOT NULL DEFAULT 0,
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS comments (
-  id          UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
-  snippet_id  UUID        NOT NULL REFERENCES snippets(id) ON DELETE CASCADE,
-  author      TEXT        NOT NULL DEFAULT 'Anonymous',
-  content     TEXT        NOT NULL,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Enable Row-Level Security
-ALTER TABLE snippets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
-
--- Snippets: anyone can read and insert; anyone can update likes
-CREATE POLICY "Public read snippets"   ON snippets FOR SELECT USING (true);
-CREATE POLICY "Public insert snippets" ON snippets FOR INSERT WITH CHECK (true);
-CREATE POLICY "Public update likes"    ON snippets FOR UPDATE USING (true)
-  WITH CHECK (true);
-
--- Comments: anyone can read and insert
-CREATE POLICY "Public read comments"   ON comments FOR SELECT USING (true);
-CREATE POLICY "Public insert comments" ON comments FOR INSERT WITH CHECK (true);</div>
-
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-body">
-        <h3>Copia tus credenciales de API</h3>
-        <p>En el panel de Supabase ve a <strong>Project Settings → API</strong>.
-           Copia la <em>Project URL</em> y la clave <em>anon / pública</em>.</p>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-body">
-        <h3>Añade las credenciales en <code style="font-size:0.9em;background:var(--bg-card);padding:2px 7px;border-radius:5px;color:var(--accent)">js/config.js</code></h3>
-        <p>Abre el archivo y reemplaza los valores de ejemplo en las líneas 11 y 12:</p>
-      </div>
-    </div>
-
-<div class="code-block">const SUPABASE_URL      = 'https://abcdefghij.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGc...(your anon key)...';</div>
-
-    <div class="step">
-      <div class="step-num">5</div>
-      <div class="step-body">
-        <h3>Despliega en GitHub Pages</h3>
-        <p>
-          Sube el repositorio a GitHub y luego ve a <strong>Settings → Pages</strong>,
-          define como origen la rama <em>main</em> y la carpeta raíz, y guarda.
-          Tu sitio quedará en <code style="font-size:0.9em;background:var(--bg-card);padding:2px 7px;border-radius:5px;color:var(--accent)">https://&lt;user&gt;.github.io/&lt;repo&gt;</code>.
-        </p>
-      </div>
-    </div>
 
     <!-- Pages overview -->
     <h2>📄 Páginas</h2>
@@ -165,7 +77,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGc...(your anon key)...';</div>
       <li><strong style="color:var(--text-primary)">index.html</strong> — Explora y descubre todas las creaciones HTML</li>
       <li><strong style="color:var(--text-primary)">upload.html</strong> — Sube una nueva creación HTML (hasta 1 MB)</li>
       <li><strong style="color:var(--text-primary)">view.html?id=…</strong> — Visualiza, da like y comenta una creación</li>
-      <li><strong style="color:var(--text-primary)">about.html</strong> — Esta página: resumen de funciones y configuración</li>
+      <li><strong style="color:var(--text-primary)">about.html</strong> — Esta página: resumen del proyecto</li>
     </ul>
 
     <!-- Tech stack -->
@@ -173,7 +85,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGc...(your anon key)...';</div>
     <p>
       HTML + CSS + JavaScript puro (sin build tools ni frameworks) y
       <a href="https://supabase.com" target="_blank" rel="noopener" style="color:var(--accent)">Supabase</a>
-      para la base de datos. Hospedado gratis en
+      para autenticación y persistencia. Hospedado gratis en
       <a href="https://pages.github.com" target="_blank" rel="noopener" style="color:var(--accent)">GitHub Pages</a>.
     </p>
 
@@ -195,5 +107,13 @@ const SUPABASE_ANON_KEY = 'eyJhbGc...(your anon key)...';</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
+  <script>
+    async function initPage() {
+      if (!(await requireAuth())) return;
+      await renderAuthNav();
+    }
+
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
 </body>
 </html>

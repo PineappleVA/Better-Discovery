@@ -17,6 +17,7 @@
       <a href="about.html">Acerca de</a>
       <a href="upload.html" class="btn btn-primary">+ Subir</a>
     </div>
+    <div class="nav-auth" id="navAuth"></div>
   </nav>
 
   <!-- ── Hero ── -->
@@ -189,7 +190,13 @@
       loadSnippets();
     });
 
-    loadSnippets();
+    async function initPage() {
+      if (!(await requireAuth())) return;
+      await renderAuthNav();
+      loadSnippets();
+    }
+
+    document.addEventListener('DOMContentLoaded', initPage);
   </script>
 </body>
 </html>
