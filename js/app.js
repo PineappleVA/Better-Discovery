@@ -7,7 +7,7 @@ let supabaseClient = null;
 const DEFAULT_AUTHOR_NAME = 'Anónimo';
 
 if (IS_CONFIGURED) {
-  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  supabaseClient = window.supabase.createClient(https://onfgppojanfagdccvrcy.supabase.co, sb_publishable_Uz6Dfl_CKXgF6nByIp50qg_O6rcbVPz);
 }
 
 /* ── Toast notifications ── */
