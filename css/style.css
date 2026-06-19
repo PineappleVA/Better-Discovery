@@ -57,6 +57,7 @@ body::after {
 
 /* ── Navigation ── */
 nav {
+  background: var(--bg-secondary);
   background: color-mix(in srgb, var(--bg-secondary) 80%, transparent);
   border-bottom: 1px solid var(--border);
   padding: 0 24px;
