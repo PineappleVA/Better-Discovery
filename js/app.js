@@ -4,9 +4,13 @@
 
 /* ── Supabase client ── */
 let supabaseClient = null;
+const DEFAULT_AUTHOR_NAME = 'Anónimo';
 
 if (IS_CONFIGURED) {
-  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    "sb_publishable_Uz6Dfl_CKXgF6nByIp50qg_O6rcbVPz"
+  );
 }
 
 /* ── Toast notifications ── */
@@ -34,15 +38,15 @@ function timeAgo(dateStr) {
   const h = Math.floor(diff / 3600000);
   const d = Math.floor(diff / 86400000);
 
-  if (m < 1)  return 'just now';
-  if (m < 60) return `${m}m ago`;
-  if (h < 24) return `${h}h ago`;
-  if (d <  7) return `${d}d ago`;
-  return new Date(dateStr).toLocaleDateString();
+  if (m < 1)  return 'ahora mismo';
+  if (m < 60) return `hace ${m} min`;
+  if (h < 24) return `hace ${h} h`;
+  if (d <  7) return `hace ${d} d`;
+  return new Date(dateStr).toLocaleDateString('es');
 }
 
 function formatDate(dateStr) {
-  return new Date(dateStr).toLocaleDateString(undefined, {
+  return new Date(dateStr).toLocaleDateString('es', {
     year: 'numeric', month: 'short', day: 'numeric'
   });
 }
@@ -63,6 +67,11 @@ function escapeHtml(str) {
     .replace(/>/g,  '&gt;')
     .replace(/"/g,  '&quot;')
     .replace(/'/g,  '&#39;');
+}
+
+function getProfileInitial(name) {
+  const value = String(name || '').trim();
+  return value ? value[0].toUpperCase() : DEFAULT_AUTHOR_NAME[0].toUpperCase();
 }
 
 /* ── Likes (stored in localStorage) ── */
@@ -95,9 +104,9 @@ function toggleLike(id) {
 function configNoticeHtml() {
   return `
     <div class="config-notice">
-      <strong>⚙️ Supabase setup required</strong><br><br>
-      Open <code>js/config.js</code> and replace the placeholder values with your
-      Supabase Project URL and anon key.<br>
-      Need help? Visit the <a href="about.html" style="color:var(--accent)">About&nbsp;/ Setup</a> page.
+      <strong>⚙️ Debes configurar Supabase</strong><br><br>
+      Abre <code>js/config.js</code> y reemplaza los valores de ejemplo por la URL
+      de tu proyecto y tu clave pública (anon).<br>
+      ¿Necesitas ayuda? Visita <a href="about.html" style="color:var(--accent)">Acerca de&nbsp;/ Configuración</a>.
     </div>`;
 }

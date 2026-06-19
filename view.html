@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>View Creation – Better Discovery</title>
+  <title>Ver creación – Better Discovery</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
     /* Full-page view: iframe on left, sidebar on right */
@@ -68,24 +68,24 @@
   <nav>
     <a href="index.html" class="nav-logo">🚀 Better Discovery</a>
     <div class="nav-links">
-      <a href="index.html">← Browse</a>
-      <a href="about.html">About</a>
-      <a href="upload.html" class="btn btn-primary">+ Upload</a>
+      <a href="index.html">← Explorar</a>
+      <a href="about.html">Acerca de</a>
+      <a href="upload.html" class="btn btn-primary">+ Subir</a>
     </div>
   </nav>
 
   <!-- Loading -->
   <div id="loadingScreen">
     <div class="spinner" style="margin:0"></div>
-    <span>Loading creation…</span>
+    <span>Cargando creación…</span>
   </div>
 
   <!-- Error -->
   <div id="errorScreen">
     <div style="font-size:3rem;margin-bottom:16px">😕</div>
-    <h2 id="errorTitle" style="margin-bottom:8px">Creation not found</h2>
-    <p id="errorMsg" style="max-width:400px;margin:0 auto 24px">This creation may have been removed or the link is invalid.</p>
-    <a href="index.html" class="btn btn-primary">← Browse all</a>
+    <h2 id="errorTitle" style="margin-bottom:8px">No se encontró la creación</h2>
+    <p id="errorMsg" style="max-width:400px;margin:0 auto 24px">Esta creación puede haber sido eliminada o el enlace es inválido.</p>
+    <a href="index.html" class="btn btn-primary">← Explorar todo</a>
   </div>
 
   <!-- Main content (shown after load) -->
@@ -99,7 +99,7 @@
              allow-forms/modals/popups enable common HTML patterns without escalation. -->
         <iframe id="previewFrame"
                 sandbox="allow-scripts allow-forms allow-modals allow-popups"
-                title="HTML preview"
+                title="Vista previa HTML"
                 allowfullscreen></iframe>
       </div>
 
@@ -108,11 +108,14 @@
 
         <!-- Info panel -->
         <div class="panel">
-          <div class="panel-label">Creation</div>
+          <div class="panel-label">Creación</div>
           <h1 class="view-title" id="snippetTitle">—</h1>
           <p  class="view-desc"  id="snippetDesc"></p>
           <div class="view-meta">
-            <span>👤 <span id="snippetAuthor">—</span></span>
+            <span class="author-pill">
+              <span class="profile-dot large" id="snippetAuthorInitial">A</span>
+              <span id="snippetAuthor">—</span>
+            </span>
             <span>📅 <span id="snippetDate">—</span></span>
             <span id="snippetTagWrap" style="display:none">🏷️ <span class="tag-badge" id="snippetTag"></span></span>
           </div>
@@ -120,31 +123,31 @@
 
         <!-- Like + actions panel -->
         <div class="panel">
-          <div class="panel-label">Actions</div>
+          <div class="panel-label">Acciones</div>
           <button class="like-btn" id="likeBtn" onclick="handleLike()">
             <span id="likeIcon">❤️</span>
-            <span id="likeLabel">Like</span>
+            <span id="likeLabel">Me gusta</span>
             <strong id="likeCount">0</strong>
           </button>
-          <button class="copy-btn" onclick="copyHtml()">📋 Copy HTML source</button>
-          <button class="fs-btn" onclick="openFullscreen()">⛶ Open in full screen</button>
+          <button class="copy-btn" onclick="copyHtml()">📋 Copiar código HTML</button>
+          <button class="fs-btn" onclick="openFullscreen()">⛶ Abrir en pantalla completa</button>
         </div>
 
         <!-- Comments panel -->
         <div class="panel" style="flex:1">
-          <div class="panel-label">Comments</div>
+          <div class="panel-label">Comentarios</div>
 
           <!-- List -->
           <div class="comments-list" id="commentsList">
-            <div class="no-comments">No comments yet. Be the first!</div>
+            <div class="no-comments">Aún no hay comentarios. ¡Escribe el primero!</div>
           </div>
 
           <!-- New comment form -->
           <div class="comment-form" id="commentForm">
-            <input id="commentAuthor" type="text" maxlength="60" placeholder="Your name (optional)">
-            <textarea id="commentText" maxlength="1000" rows="3" placeholder="Write a comment…"></textarea>
+            <input id="commentAuthor" type="text" maxlength="60" placeholder="Tu nombre (opcional)">
+            <textarea id="commentText" maxlength="1000" rows="3" placeholder="Escribe un comentario…"></textarea>
             <button class="btn btn-primary" onclick="submitComment()" style="width:100%;justify-content:center">
-              💬 Post comment
+              💬 Publicar comentario
             </button>
           </div>
         </div>
@@ -165,10 +168,10 @@
 
     /* ── Load snippet ── */
     async function loadSnippet() {
-      if (!snippetId) { showError('No ID provided', 'Add ?id=<snippet-id> to the URL.'); return; }
+      if (!snippetId) { showError('No se indicó un ID', 'Agrega ?id=<snippet-id> en la URL.'); return; }
 
       if (!IS_CONFIGURED) {
-        showError('Supabase not configured', 'Open js/config.js and add your credentials. See the About page for details.');
+        showError('Supabase no está configurado', 'Abre js/config.js y añade tus credenciales. Consulta la página Acerca de para más detalles.');
         return;
       }
 
@@ -179,14 +182,14 @@
           .eq('id', snippetId)
           .single();
 
-        if (error || !data) throw error || new Error('Not found');
+        if (error || !data) throw error || new Error('No encontrado');
 
         snippetData = data;
         renderSnippet(data);
         loadComments();
 
       } catch (err) {
-        showError('Creation not found', err.message);
+        showError('No se encontró la creación', err.message);
       }
     }
 
@@ -195,7 +198,10 @@
 
       document.getElementById('snippetTitle').textContent  = s.title;
       document.getElementById('snippetDesc').textContent   = s.description || '';
-      document.getElementById('snippetAuthor').textContent = s.author || 'Anonymous';
+      const author = s.author || DEFAULT_AUTHOR_NAME;
+      document.getElementById('snippetAuthor').textContent = author;
+      const authorInitialEl = document.getElementById('snippetAuthorInitial');
+      if (authorInitialEl) authorInitialEl.textContent = getProfileInitial(author);
       document.getElementById('snippetDate').textContent   = formatDate(s.created_at);
 
       if (s.tag) {
@@ -235,12 +241,15 @@
     function renderComments(comments) {
       const list = document.getElementById('commentsList');
       if (!comments.length) {
-        list.innerHTML = '<div class="no-comments">No comments yet. Be the first!</div>';
+        list.innerHTML = '<div class="no-comments">Aún no hay comentarios. ¡Escribe el primero!</div>';
         return;
       }
       list.innerHTML = comments.map(c => `
         <div class="comment">
-          <div class="comment-author">${escapeHtml(c.author || 'Anonymous')}</div>
+          <div class="comment-header">
+            <span class="profile-dot">${escapeHtml(getProfileInitial(c.author || DEFAULT_AUTHOR_NAME))}</span>
+            <div class="comment-author">${escapeHtml(c.author || DEFAULT_AUTHOR_NAME)}</div>
+          </div>
           <div class="comment-body">${escapeHtml(c.content)}</div>
           <div class="comment-time">${timeAgo(c.created_at)}</div>
         </div>`).join('');
@@ -249,15 +258,15 @@
     }
 
     async function submitComment() {
-      const author  = document.getElementById('commentAuthor').value.trim() || 'Anonymous';
+      const author  = document.getElementById('commentAuthor').value.trim() || DEFAULT_AUTHOR_NAME;
       const content = document.getElementById('commentText').value.trim();
 
-      if (!content) { showToast('Comment cannot be empty.', 'error'); return; }
-      if (!IS_CONFIGURED) { showToast('Supabase not configured.', 'error'); return; }
+      if (!content) { showToast('El comentario no puede estar vacío.', 'error'); return; }
+      if (!IS_CONFIGURED) { showToast('Supabase no está configurado.', 'error'); return; }
 
       const btn = document.querySelector('.comment-form .btn');
       btn.disabled    = true;
-      btn.textContent = '⏳ Posting…';
+      btn.textContent = '⏳ Publicando…';
 
       try {
         const { error } = await supabaseClient
@@ -267,14 +276,14 @@
         if (error) throw error;
 
         document.getElementById('commentText').value = '';
-        showToast('Comment posted!', 'success');
+        showToast('¡Comentario publicado!', 'success');
         loadComments();
 
       } catch (err) {
         showToast(`Error: ${err.message}`, 'error', 5000);
       } finally {
         btn.disabled    = false;
-        btn.textContent = '💬 Post comment';
+        btn.textContent = '💬 Publicar comentario';
       }
     }
 
@@ -304,7 +313,7 @@
         toggleLike(snippetId); // revert localStorage
         document.getElementById('likeCount').textContent = reverted;
         document.getElementById('likeBtn').classList.toggle('liked', !nowLiked);
-        showToast('Could not save like — please try again.', 'error');
+        showToast('No se pudo guardar el like — inténtalo de nuevo.', 'error');
       }
     }
 
@@ -312,8 +321,8 @@
     function copyHtml() {
       if (!snippetData) return;
       navigator.clipboard.writeText(snippetData.html_content)
-        .then(() => showToast('HTML copied to clipboard!', 'success'))
-        .catch(() => showToast('Could not copy — try again.', 'error'));
+        .then(() => showToast('¡HTML copiado al portapapeles!', 'success'))
+        .catch(() => showToast('No se pudo copiar — inténtalo de nuevo.', 'error'));
     }
 
     /* ── Fullscreen ── */
