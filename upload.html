@@ -93,6 +93,12 @@
       Consulta la página <a href="about.html" style="color:var(--accent)">Acerca de / Configuración</a>.
     </div>
 
+    <div class="panel" style="margin-bottom:24px">
+      <div class="panel-label">Perfil rápido</div>
+      <p style="color:var(--text-muted);margin-bottom:12px">Tu nombre público se usa para firmar las creaciones y aparecer en tu perfil.</p>
+      <input id="quickProfileName" class="form-input" type="text" maxlength="60" placeholder="Nombre público">
+    </div>
+
     <form id="uploadForm" novalidate>
 
       <!-- Title -->
@@ -140,6 +146,12 @@
           <button type="button" id="togglePreview">👁 Vista previa</button>
         </div>
 
+        <div style="margin-bottom:10px">
+          <label class="form-label" for="htmlFile">Cargar archivo .html</label>
+          <input id="htmlFile" class="form-input" type="file" accept=".html,.htm,text/html">
+          <div class="size-bar" style="justify-content:flex-start;margin-top:6px">Se rechazan archivos ZIP o cualquier formato que no sea HTML.</div>
+        </div>
+
         <textarea id="htmlCode" class="form-textarea code-textarea" spellcheck="false"
                   placeholder="<!DOCTYPE html>&#10;<html>&#10;  <head><title>Mi creación</title></head>&#10;  <body>&#10;    <h1>¡Hola mundo!</h1>&#10;  </body>&#10;</html>"></textarea>
 
@@ -179,6 +191,12 @@
     </div>
   </div>
 
+  <footer class="site-footer">
+    <a href="terms.html">Términos y condiciones</a>
+    <span>·</span>
+    <a href="privacy.html">Política de privacidad</a>
+  </footer>
+
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
@@ -186,6 +204,24 @@
   <script>
     const MAX_BYTES = 1 * 1024 * 1024; // 1 MB
     let previewVisible = false;
+
+    function getHtmlInputValue() {
+      return document.getElementById('htmlCode').value;
+    }
+
+    function validateHtmlDocument(code) {
+      const value = String(code || '').trim();
+      if (!value) return 'El código HTML no puede estar vacío.';
+      if (!/<html[\s>]/i.test(value)) return 'Solo se aceptan documentos HTML completos.';
+      if (!/<body[\s>]/i.test(value)) return 'El HTML debe incluir un cuerpo <body>.';
+      return null;
+    }
+
+    function isHtmlFile(file) {
+      const name = String(file?.name || '').toLowerCase();
+      const type = String(file?.type || '').toLowerCase();
+      return (name.endsWith('.html') || name.endsWith('.htm')) || type === 'text/html';
+    }
 
     /* ── Show config warning ── */
     if (!IS_CONFIGURED) {
@@ -224,6 +260,30 @@
       if (previewVisible) refreshPreview();
     });
 
+    document.getElementById('htmlFile').addEventListener('change', async e => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      if (!isHtmlFile(file)) {
+        showToast('Solo se permiten archivos HTML. ZIP y otros formatos están rechazados.', 'error');
+        e.target.value = '';
+        return;
+      }
+
+      const text = await file.text();
+      const validationError = validateHtmlDocument(text);
+      if (validationError) {
+        showToast(validationError, 'error');
+        e.target.value = '';
+        return;
+      }
+
+      document.getElementById('htmlCode').value = text;
+      updateSizeIndicator();
+      if (previewVisible) refreshPreview();
+      showToast('Archivo HTML cargado correctamente.', 'success');
+    });
+
     /* ── Live preview toggle ── */
     const previewIframe = document.getElementById('livePreview');
 
@@ -250,16 +310,20 @@
 
       const title    = document.getElementById('title').value.trim();
       const desc     = document.getElementById('description').value.trim();
-      const author   = document.getElementById('author').value.trim() || DEFAULT_AUTHOR_NAME;
+      const profileName = document.getElementById('quickProfileName').value.trim() || getProfileData().displayName;
+      const author   = document.getElementById('author').value.trim() || profileName || DEFAULT_AUTHOR_NAME;
       const tag      = document.getElementById('tag').value;
-      const htmlCode = document.getElementById('htmlCode').value;
+      const htmlCode = getHtmlInputValue();
 
       /* Validation */
       if (!title) { showToast('Añade un título.', 'error'); document.getElementById('title').focus(); return; }
-      if (!htmlCode.trim()) { showToast('El código HTML no puede estar vacío.', 'error'); document.getElementById('htmlCode').focus(); return; }
+      const validationError = validateHtmlDocument(htmlCode);
+      if (validationError) { showToast(validationError, 'error'); document.getElementById('htmlCode').focus(); return; }
 
       const bytes = new TextEncoder().encode(htmlCode).length;
       if (bytes > MAX_BYTES) { showToast('El HTML supera el límite de 1 MB.', 'error'); return; }
+
+      saveProfileData({ displayName: profileName, bio: getProfileData().bio });
 
       /* Submit */
       const btn    = document.getElementById('submitBtn');
@@ -278,6 +342,7 @@
         if (error) throw error;
 
         /* Show success */
+        recordOwnedSnippetId(data.id);
         document.getElementById('formPage').style.display    = 'none';
         document.getElementById('successPage').style.display = 'block';
         document.getElementById('viewLink').href = `view.html?id=${encodeURIComponent(data.id)}`;
@@ -291,8 +356,11 @@
     });
 
     async function initPage() {
-      if (!(await requireAuth())) return;
+      await requireAuth({ redirect: false });
       await renderAuthNav();
+      const profile = getProfileData();
+      document.getElementById('quickProfileName').value = profile.displayName === DEFAULT_AUTHOR_NAME ? '' : profile.displayName;
+      document.getElementById('author').placeholder = profile.displayName;
     }
 
     document.addEventListener('DOMContentLoaded', initPage);

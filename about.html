@@ -53,6 +53,11 @@
         <p>Deja feedback, preguntas o apoyo a las personas creadoras.</p>
       </div>
       <div class="feature-card">
+        <div class="ico">👤</div>
+        <h3>Perfil y creaciones</h3>
+        <p>Edita tu perfil, sigue a otras personas y revisa tu espacio usado.</p>
+      </div>
+      <div class="feature-card">
         <div class="ico">🔍</div>
         <h3>Búsqueda</h3>
         <p>Encuentra creaciones por título o descripción con búsqueda instantánea.</p>
@@ -67,17 +72,20 @@
     <h2>🔐 Acceso</h2>
     <p>
       Usa la pantalla de <a href="login.html" style="color:var(--accent)">Login</a> para entrar con tu cuenta
-      y luego explora, sube y comenta creaciones.
+      y luego explora, sube, comenta y administra tu perfil.
     </p>
 
     <!-- Pages overview -->
     <h2>📄 Páginas</h2>
-    <p>El proyecto contiene cuatro páginas:</p>
+    <p>El proyecto contiene varias páginas:</p>
     <ul style="color:var(--text-muted);padding-left:20px;line-height:2">
       <li><strong style="color:var(--text-primary)">index.html</strong> — Explora y descubre todas las creaciones HTML</li>
       <li><strong style="color:var(--text-primary)">upload.html</strong> — Sube una nueva creación HTML (hasta 1 MB)</li>
       <li><strong style="color:var(--text-primary)">view.html?id=…</strong> — Visualiza, da like y comenta una creación</li>
+      <li><strong style="color:var(--text-primary)">profile.html</strong> — Edita tu perfil, ve tus creaciones y seguidores</li>
       <li><strong style="color:var(--text-primary)">about.html</strong> — Esta página: resumen del proyecto</li>
+      <li><strong style="color:var(--text-primary)">terms.html</strong> — Términos y condiciones</li>
+      <li><strong style="color:var(--text-primary)">privacy.html</strong> — Política de privacidad</li>
     </ul>
 
     <!-- Tech stack -->
@@ -85,7 +93,7 @@
     <p>
       HTML + CSS + JavaScript puro (sin build tools ni frameworks) y
       <a href="https://supabase.com" target="_blank" rel="noopener" style="color:var(--accent)">Supabase</a>
-      para autenticación y persistencia. Hospedado gratis en
+      para autenticación y persistencia. Todo está pensado para alojarse en
       <a href="https://pages.github.com" target="_blank" rel="noopener" style="color:var(--accent)">GitHub Pages</a>.
     </p>
 
@@ -101,6 +109,12 @@
       <a href="https://github.com" style="color:var(--accent)">GitHub</a>
     </div>
 
+    <footer class="site-footer">
+      <a href="terms.html">Términos y condiciones</a>
+      <span>·</span>
+      <a href="privacy.html">Política de privacidad</a>
+    </footer>
+
   </div>
 
   <!-- Scripts (mínimos: esta página no hace consultas a la base de datos) -->
@@ -109,7 +123,7 @@
   <script src="js/app.js"></script>
   <script>
     async function initPage() {
-      if (!(await requireAuth())) return;
+      await requireAuth({ redirect: false });
       await renderAuthNav();
     }
 

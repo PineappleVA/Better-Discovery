@@ -58,6 +58,12 @@
 
   </div>
 
+  <footer class="site-footer">
+    <a href="terms.html">Términos y condiciones</a>
+    <span>·</span>
+    <a href="privacy.html">Política de privacidad</a>
+  </footer>
+
   <!-- ── Scripts ── -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
@@ -191,7 +197,7 @@
     });
 
     async function initPage() {
-      if (!(await requireAuth())) return;
+      await requireAuth({ redirect: false });
       await renderAuthNav();
       loadSnippets();
     }

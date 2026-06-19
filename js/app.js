@@ -6,6 +6,10 @@
 let supabaseClient = null;
 const DEFAULT_AUTHOR_NAME = 'Anónimo';
 const LOGIN_PAGE = 'login.html';
+const PROFILE_PAGE = 'profile.html';
+const PROFILE_STORAGE_KEY = 'bd_profile';
+const FOLLOW_STORAGE_KEY = 'bd_followed_authors';
+const OWNED_SNIPPETS_STORAGE_KEY = 'bd_owned_snippets';
 
 if (IS_CONFIGURED) {
   supabaseClient = window.supabase.createClient(
@@ -25,11 +29,12 @@ async function getSession() {
   return data?.session ?? null;
 }
 
-async function requireAuth() {
+async function requireAuth(options = {}) {
+  const redirect = options.redirect !== false;
   if (isLoginPage()) return true;
   const session = await getSession();
   if (!session) {
-    window.location.replace(LOGIN_PAGE);
+    if (redirect) window.location.replace(LOGIN_PAGE);
     return false;
   }
   return true;
@@ -50,9 +55,14 @@ async function renderAuthNav() {
     return;
   }
 
-  const email = session.user?.email || DEFAULT_AUTHOR_NAME;
+  const profile = getProfileData();
+  const email = profile.displayName || session.user?.email || DEFAULT_AUTHOR_NAME;
+  const profileLink = window.location.pathname.endsWith('/profile.html') || window.location.pathname.endsWith('/profile')
+    ? ''
+    : `<a href="${PROFILE_PAGE}" class="btn btn-outline">Perfil</a>`;
   navAuth.innerHTML = `
     <span class="user-label">${escapeHtml(email)}</span>
+    ${profileLink}
     <button type="button" class="btn btn-outline" id="logoutBtn">Salir</button>
   `;
 
@@ -121,6 +131,86 @@ function escapeHtml(str) {
 function getProfileInitial(name) {
   const value = String(name || '').trim();
   return value ? value[0].toUpperCase() : DEFAULT_AUTHOR_NAME[0].toUpperCase();
+}
+
+function readJsonStorage(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw);
+    return parsed ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeJsonStorage(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+function getProfileData() {
+  const profile = readJsonStorage(PROFILE_STORAGE_KEY, {});
+  return {
+    displayName: String(profile.displayName || DEFAULT_AUTHOR_NAME).trim(),
+    bio: String(profile.bio || '').trim(),
+  };
+}
+
+function saveProfileData(profile) {
+  const next = {
+    displayName: String(profile.displayName || DEFAULT_AUTHOR_NAME).trim() || DEFAULT_AUTHOR_NAME,
+    bio: String(profile.bio || '').trim(),
+  };
+  writeJsonStorage(PROFILE_STORAGE_KEY, next);
+  return next;
+}
+
+function getOwnedSnippetIds() {
+  const ids = readJsonStorage(OWNED_SNIPPETS_STORAGE_KEY, []);
+  return Array.isArray(ids) ? ids.filter(Boolean) : [];
+}
+
+function recordOwnedSnippetId(id) {
+  const ids = new Set(getOwnedSnippetIds());
+  ids.add(String(id));
+  writeJsonStorage(OWNED_SNIPPETS_STORAGE_KEY, [...ids]);
+}
+
+function getFollowedAuthors() {
+  const authors = readJsonStorage(FOLLOW_STORAGE_KEY, []);
+  return Array.isArray(authors)
+    ? [...new Set(authors.map(author => String(author || '').trim()).filter(Boolean))]
+    : [];
+}
+
+function isFollowingAuthor(author) {
+  const target = String(author || '').trim().toLowerCase();
+  if (!target) return false;
+  return getFollowedAuthors().some(name => name.toLowerCase() === target);
+}
+
+function toggleFollowAuthor(author) {
+  const target = String(author || '').trim();
+  if (!target) return { nowFollowing: false };
+  const current = getFollowedAuthors();
+  const targetLower = target.toLowerCase();
+  const index = current.findIndex(name => name.toLowerCase() === targetLower);
+  const nowFollowing = index === -1;
+  if (nowFollowing) {
+    current.unshift(target);
+  } else {
+    current.splice(index, 1);
+  }
+  writeJsonStorage(FOLLOW_STORAGE_KEY, current);
+  return { nowFollowing };
+}
+
+function snippetBytes(snippet) {
+  return new TextEncoder().encode(String(snippet?.html_content || '')).length;
 }
 
 /* ── Likes (stored in localStorage) ── */

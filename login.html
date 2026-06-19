@@ -110,10 +110,17 @@
       </form>
 
       <div class="auth-note">
-        Al continuar aceptas nuestros terminos y condiciones.
+        Al continuar aceptas nuestros <a href="terms.html" style="color:var(--accent)">términos y condiciones</a>
+        y la <a href="privacy.html" style="color:var(--accent)">política de privacidad</a>.
       </div>
     </section>
   </main>
+
+  <footer class="site-footer">
+    <a href="terms.html">Términos y condiciones</a>
+    <span>·</span>
+    <a href="privacy.html">Política de privacidad</a>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
@@ -181,8 +188,8 @@
             return;
           }
 
-          status.textContent = 'Revisa tu correo para confirmar la cuenta.';
-          showToast('Revisa tu correo para terminar el acceso.', 'success', 6000);
+          status.textContent = 'Cuenta creada. Inicia sesión para continuar.';
+          showToast('Cuenta creada. Ahora puedes iniciar sesión.', 'success', 6000);
         } catch (err) {
           status.textContent = err.message;
           showToast(err.message, 'error', 6000);

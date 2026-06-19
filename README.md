@@ -2,7 +2,7 @@
 
 Una galería comunitaria de creaciones HTML alojada en **GitHub Pages** y conectada a **Supabase**.
 
-Sube hasta **1 MB** de código HTML para que otras personas lo vean en una vista previa con sandbox y puedan interactuar con **likes** y **comentarios**.
+Sube hasta **1 MB** de código HTML para que otras personas lo vean en una vista previa con sandbox y puedan interactuar con **likes**, **comentarios** y perfiles.
 
 ---
 
@@ -14,6 +14,7 @@ Sube hasta **1 MB** de código HTML para que otras personas lo vean en una vista
 | 🖥️ Vista previa en vivo | Un iframe con sandbox ejecuta el HTML de forma segura |
 | ❤️ Me gusta | Sistema de likes persistido en Supabase |
 | 💬 Comentarios | Deja feedback y lee opiniones de otras personas |
+| 👤 Perfil y creaciones | Edita tu perfil, sigue a gente y revisa tu espacio usado |
 | 🔍 Búsqueda | Búsqueda instantánea por título o descripción |
 | 📄 Ordenado | Ordena por más recientes o más valorados |
 | 📱 Responsive | Funciona en escritorio y móvil |
@@ -28,6 +29,9 @@ Usa `login.html` para entrar con tu cuenta y navegar por el sitio.
 - **`index.html`** — Explora y descubre creaciones
 - **`upload.html`** — Sube una nueva creación HTML
 - **`view.html?id=…`** — Visualiza, da like y comenta una creación
+- **`profile.html`** — Edita tu perfil, ve tus creaciones y a quién sigues
+- **`terms.html`** — Términos y condiciones
+- **`privacy.html`** — Política de privacidad
 - **`about.html`** — Resumen del proyecto
 
 ---
@@ -41,6 +45,10 @@ Usa `login.html` para entrar con tu cuenta y navegar por el sitio.
 ## 🔒 Seguridad
 
 Todo el HTML subido se ejecuta dentro de un `<iframe>` aislado con `sandbox` restringido.
+
+## 🧑‍⚖️ Legal
+
+Consulta [terms.html](terms.html) y [privacy.html](privacy.html) para ver las condiciones de uso y la política de privacidad.
 
 ---
 
