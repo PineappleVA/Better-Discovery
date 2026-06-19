@@ -325,7 +325,7 @@
 
     function updateUsage(snippets) {
       const used = snippets.reduce((sum, snippet) => sum + snippetBytes(snippet), 0);
-      const pct = Math.min((used / MAX_BYTES) * 100, 100);
+      const pct = used >= MAX_BYTES ? 100 : (used / MAX_BYTES) * 100;
       document.getElementById('usageText').textContent = `${bytesToSize(used)} / 1 MB`;
       document.getElementById('usagePercent').textContent = `${pct.toFixed(1)}%`;
       document.getElementById('usageBar').style.width = `${pct}%`;

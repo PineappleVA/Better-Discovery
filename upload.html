@@ -217,7 +217,7 @@
       return null;
     }
 
-    function isHtmlFile(file) {
+    function isAllowedHtmlFile(file) {
       const name = String(file?.name || '').toLowerCase();
       const type = String(file?.type || '').toLowerCase();
       return (name.endsWith('.html') || name.endsWith('.htm')) || type === 'text/html';
@@ -264,7 +264,7 @@
       const file = e.target.files?.[0];
       if (!file) return;
 
-      if (!isHtmlFile(file)) {
+      if (!isAllowedHtmlFile(file)) {
         showToast('Solo se permiten archivos HTML. ZIP y otros formatos están rechazados.', 'error');
         e.target.value = '';
         return;
