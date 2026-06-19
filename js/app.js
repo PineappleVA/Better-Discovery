@@ -9,7 +9,7 @@ const DEFAULT_AUTHOR_NAME = 'Anónimo';
 if (IS_CONFIGURED) {
   supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
-    "sb_publishable_Uz6Dfl_CKXgF6nByIp50qg_O6rcbVPz"
+    SUPABASE_ANON_KEY
   );
 }
 
@@ -105,7 +105,7 @@ function configNoticeHtml() {
   return `
     <div class="config-notice">
       <strong>⚙️ Debes configurar Supabase</strong><br><br>
-      Abre <code>js/config.js</code> y reemplaza los valores de ejemplo por la URL
+      Abre <code>js/config.js</code> y completa las líneas 11 y 12 con la URL
       de tu proyecto y tu clave pública (anon).<br>
       ¿Necesitas ayuda? Visita <a href="about.html" style="color:var(--accent)">Acerca de&nbsp;/ Configuración</a>.
     </div>`;

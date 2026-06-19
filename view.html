@@ -94,9 +94,7 @@
 
       <!-- iframe preview -->
       <div class="preview-wrap">
-        <!-- Sandbox: allow-scripts without allow-same-origin keeps iframe in a null origin,
-             preventing access to the host page's cookies, localStorage and DOM.
-             allow-forms/modals/popups enable common HTML patterns without escalation. -->
+        <!-- Sandbox aislado para renderizar el HTML de forma segura. -->
         <iframe id="previewFrame"
                 sandbox="allow-scripts allow-forms allow-modals allow-popups"
                 title="Vista previa HTML"
@@ -171,7 +169,7 @@
       if (!snippetId) { showError('No se indicó un ID', 'Agrega ?id=<snippet-id> en la URL.'); return; }
 
       if (!IS_CONFIGURED) {
-        showError('Supabase no está configurado', 'Abre js/config.js y añade tus credenciales. Consulta la página Acerca de para más detalles.');
+        showError('Supabase no está configurado', 'Abre js/config.js y completa la URL y la clave anon en las líneas 11 y 12.');
         return;
       }
 

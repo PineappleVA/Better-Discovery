@@ -71,7 +71,7 @@ CREATE POLICY "Public insert comments" ON comments FOR INSERT WITH CHECK (true);
 
 ### 3 — Añade tus credenciales
 
-Abre **`js/config.js`** y reemplaza los valores de ejemplo:
+Edita **`js/config.js`** y completa las líneas 11 y 12 con tu URL y tu clave anon:
 
 ```js
 const SUPABASE_URL      = 'https://YOUR_PROJECT_ID.supabase.co';
@@ -94,7 +94,7 @@ Haz push a GitHub y luego ve a **Settings → Pages**, define como origen la ram
 
 ## 🔒 Seguridad
 
-Todo el HTML subido se ejecuta dentro de un `<iframe>` con atributo `sandbox` restringido (`allow-scripts allow-forms allow-modals allow-popups`). Los iframes corren en **origen nulo** y no pueden acceder a cookies, localStorage ni DOM de la página principal.
+Todo el HTML subido se ejecuta dentro de un `<iframe>` aislado con `sandbox` restringido.
 
 ---
 
