@@ -72,6 +72,7 @@
       <a href="about.html">Acerca de</a>
       <a href="upload.html" class="btn btn-primary">+ Subir</a>
     </div>
+    <div class="nav-auth" id="navAuth"></div>
   </nav>
 
   <!-- Loading -->
@@ -94,9 +95,7 @@
 
       <!-- iframe preview -->
       <div class="preview-wrap">
-        <!-- Sandbox: allow-scripts without allow-same-origin keeps iframe in a null origin,
-             preventing access to the host page's cookies, localStorage and DOM.
-             allow-forms/modals/popups enable common HTML patterns without escalation. -->
+        <!-- Sandbox aislado para renderizar el HTML de forma segura. -->
         <iframe id="previewFrame"
                 sandbox="allow-scripts allow-forms allow-modals allow-popups"
                 title="Vista previa HTML"
@@ -129,8 +128,7 @@
             <span id="likeLabel">Me gusta</span>
             <strong id="likeCount">0</strong>
           </button>
-          <button class="copy-btn" onclick="copyHtml()">📋 Copiar código HTML</button>
-          <button class="fs-btn" onclick="openFullscreen()">⛶ Abrir en pantalla completa</button>
+          <button class="like-btn" id="followBtn" onclick="toggleFollow()" style="margin-top:10px">👤 Seguir autor</button>
         </div>
 
         <!-- Comments panel -->
@@ -156,6 +154,12 @@
     </div>
   </div>
 
+  <footer class="site-footer">
+    <a href="terms.html">Términos y condiciones</a>
+    <span>·</span>
+    <a href="privacy.html">Política de privacidad</a>
+  </footer>
+
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
@@ -171,7 +175,7 @@
       if (!snippetId) { showError('No se indicó un ID', 'Agrega ?id=<snippet-id> en la URL.'); return; }
 
       if (!IS_CONFIGURED) {
-        showError('Supabase no está configurado', 'Abre js/config.js y añade tus credenciales. Consulta la página Acerca de para más detalles.');
+        showError('Supabase no está configurado', 'Abre js/config.js y completa la URL y la clave anon en las líneas 11 y 12.');
         return;
       }
 
@@ -213,6 +217,7 @@
       const liked = isLiked(s.id);
       document.getElementById('likeCount').textContent = s.likes ?? 0;
       if (liked) document.getElementById('likeBtn').classList.add('liked');
+      renderFollowButton(author);
 
       /* Set iframe content */
       document.getElementById('previewFrame').srcdoc = s.html_content;
@@ -317,20 +322,27 @@
       }
     }
 
-    /* ── Copy HTML ── */
-    function copyHtml() {
-      if (!snippetData) return;
-      navigator.clipboard.writeText(snippetData.html_content)
-        .then(() => showToast('¡HTML copiado al portapapeles!', 'success'))
-        .catch(() => showToast('No se pudo copiar — inténtalo de nuevo.', 'error'));
+    function renderFollowButton(author) {
+      const btn = document.getElementById('followBtn');
+      if (!btn) return;
+
+      const currentProfile = getProfileData().displayName;
+      const target = String(author || '').trim();
+      if (!target || target.toLowerCase() === currentProfile.toLowerCase()) {
+        btn.textContent = '👤 Es tu perfil';
+        btn.disabled = true;
+        return;
+      }
+
+      btn.disabled = false;
+      btn.textContent = isFollowingAuthor(target) ? '✓ Siguiendo' : '👤 Seguir autor';
     }
 
-    /* ── Fullscreen ── */
-    function openFullscreen() {
-      if (!snippetData) return;
-      const blob = new Blob([snippetData.html_content], { type: 'text/html' });
-      const url  = URL.createObjectURL(blob);
-      window.open(url, '_blank', 'noopener,noreferrer');
+    function toggleFollow() {
+      if (!snippetData?.author) return;
+      const { nowFollowing } = toggleFollowAuthor(snippetData.author);
+      renderFollowButton(snippetData.author);
+      showToast(nowFollowing ? 'Autor seguido.' : 'Autor dejado de seguir.', 'success');
     }
 
     /* ── Error screen ── */
@@ -341,7 +353,13 @@
       document.getElementById('errorMsg').textContent   = msg;
     }
 
-    loadSnippet();
+    async function initPage() {
+      await requireAuth({ redirect: false });
+      await renderAuthNav();
+      loadSnippet();
+    }
+
+    document.addEventListener('DOMContentLoaded', initPage);
   </script>
 </body>
 </html>

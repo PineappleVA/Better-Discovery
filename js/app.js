@@ -5,12 +5,74 @@
 /* ── Supabase client ── */
 let supabaseClient = null;
 const DEFAULT_AUTHOR_NAME = 'Anónimo';
+const LOGIN_PAGE = 'login.html';
+const PROFILE_PAGE = 'profile.html';
+const PROFILE_STORAGE_KEY = 'bd_profile';
+const FOLLOW_STORAGE_KEY = 'bd_followed_authors';
+const OWNED_SNIPPETS_STORAGE_KEY = 'bd_owned_snippets';
+const textEncoder = new TextEncoder();
 
 if (IS_CONFIGURED) {
   supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
     "sb_publishable_Uz6Dfl_CKXgF6nByIp50qg_O6rcbVPz"
+    SUPABASE_ANON_KEY,
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uZmdwcG9qYW5mYWdkY2N2cmN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NzA5NjMsImV4cCI6MjA5NzQ0Njk2M30.U93p34ZfBnHND0Xozj-9o2DzrAmvypb053P7274f7cg"
   );
+}
+
+function isLoginPage() {
+  return window.location.pathname.endsWith('/login.html') ||
+         window.location.pathname.endsWith('/login');
+}
+
+async function getSession() {
+  if (!supabaseClient) return null;
+  const { data } = await supabaseClient.auth.getSession();
+  return data?.session ?? null;
+}
+
+async function requireAuth(options = {}) {
+  const redirect = options.redirect !== false;
+  if (isLoginPage()) return true;
+  const session = await getSession();
+  if (!session) {
+    if (redirect) window.location.replace(LOGIN_PAGE);
+    return false;
+  }
+  return true;
+}
+
+async function renderAuthNav() {
+  const navAuth = document.getElementById('navAuth');
+  if (!navAuth) return;
+
+  if (!supabaseClient) {
+    navAuth.innerHTML = '';
+    return;
+  }
+
+  const session = await getSession();
+  if (!session) {
+    navAuth.innerHTML = `<a href="${LOGIN_PAGE}" class="btn btn-primary">Login</a>`;
+    return;
+  }
+
+  const profile = getProfileData();
+  const displayLabel = profile.displayName || session.user?.email || DEFAULT_AUTHOR_NAME;
+  const profileLink = window.location.pathname.endsWith('/profile.html') || window.location.pathname.endsWith('/profile')
+    ? ''
+    : `<a href="${PROFILE_PAGE}" class="btn btn-outline">Perfil</a>`;
+  navAuth.innerHTML = `
+    <span class="user-label">${escapeHtml(displayLabel)}</span>
+    ${profileLink}
+    <button type="button" class="btn btn-outline" id="logoutBtn">Salir</button>
+  `;
+
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.replace(LOGIN_PAGE);
+  });
 }
 
 /* ── Toast notifications ── */
@@ -74,6 +136,86 @@ function getProfileInitial(name) {
   return value ? value[0].toUpperCase() : DEFAULT_AUTHOR_NAME[0].toUpperCase();
 }
 
+function readJsonStorage(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw);
+    return parsed ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeJsonStorage(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+function getProfileData() {
+  const profile = readJsonStorage(PROFILE_STORAGE_KEY, {});
+  return {
+    displayName: String(profile.displayName || DEFAULT_AUTHOR_NAME).trim(),
+    bio: String(profile.bio || '').trim(),
+  };
+}
+
+function saveProfileData(profile) {
+  const next = {
+    displayName: String(profile.displayName || DEFAULT_AUTHOR_NAME).trim() || DEFAULT_AUTHOR_NAME,
+    bio: String(profile.bio || '').trim(),
+  };
+  writeJsonStorage(PROFILE_STORAGE_KEY, next);
+  return next;
+}
+
+function getOwnedSnippetIds() {
+  const ids = readJsonStorage(OWNED_SNIPPETS_STORAGE_KEY, []);
+  return Array.isArray(ids) ? ids.filter(Boolean) : [];
+}
+
+function recordOwnedSnippetId(id) {
+  const ids = new Set(getOwnedSnippetIds());
+  ids.add(String(id));
+  writeJsonStorage(OWNED_SNIPPETS_STORAGE_KEY, [...ids]);
+}
+
+function getFollowedAuthors() {
+  const authors = readJsonStorage(FOLLOW_STORAGE_KEY, []);
+  return Array.isArray(authors)
+    ? [...new Set(authors.map(author => String(author || '').trim()).filter(Boolean))]
+    : [];
+}
+
+function isFollowingAuthor(author) {
+  const target = String(author || '').trim().toLowerCase();
+  if (!target) return false;
+  return getFollowedAuthors().some(name => name.toLowerCase() === target);
+}
+
+function toggleFollowAuthor(author) {
+  const target = String(author || '').trim();
+  if (!target) return { nowFollowing: false };
+  const current = getFollowedAuthors();
+  const targetLower = target.toLowerCase();
+  const index = current.findIndex(name => name.toLowerCase() === targetLower);
+  const nowFollowing = index === -1;
+  if (nowFollowing) {
+    current.unshift(target);
+  } else {
+    current.splice(index, 1);
+  }
+  writeJsonStorage(FOLLOW_STORAGE_KEY, current);
+  return { nowFollowing };
+}
+
+function snippetBytes(snippet) {
+  return textEncoder.encode(String(snippet?.html_content || '')).length;
+}
+
 /* ── Likes (stored in localStorage) ── */
 function getLikedSet() {
   try { return new Set(JSON.parse(localStorage.getItem('bd_liked') || '[]')); }
@@ -104,9 +246,8 @@ function toggleLike(id) {
 function configNoticeHtml() {
   return `
     <div class="config-notice">
-      <strong>⚙️ Debes configurar Supabase</strong><br><br>
-      Abre <code>js/config.js</code> y reemplaza los valores de ejemplo por la URL
-      de tu proyecto y tu clave pública (anon).<br>
-      ¿Necesitas ayuda? Visita <a href="about.html" style="color:var(--accent)">Acerca de&nbsp;/ Configuración</a>.
+      <strong>⚙️ No se pudo iniciar Supabase</strong><br><br>
+      Revisa <code>js/config.js</code> y vuelve a cargar la página.<br>
+      Si estás en login, intenta entrar de nuevo.
     </div>`;
 }

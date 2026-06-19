@@ -17,6 +17,7 @@
       <a href="about.html" class="active">Acerca de</a>
       <a href="upload.html" class="btn btn-primary">+ Subir</a>
     </div>
+    <div class="nav-auth" id="navAuth"></div>
   </nav>
 
   <div class="about-page">
@@ -39,7 +40,7 @@
       <div class="feature-card">
         <div class="ico">🖥️</div>
         <h3>Vista previa en vivo</h3>
-        <p>Cada creación corre en un iframe con sandbox — incluyendo scripts.</p>
+        <p>Cada creación corre en un iframe con sandbox aislado.</p>
       </div>
       <div class="feature-card">
         <div class="ico">❤️</div>
@@ -50,6 +51,11 @@
         <div class="ico">💬</div>
         <h3>Comentarios</h3>
         <p>Deja feedback, preguntas o apoyo a las personas creadoras.</p>
+      </div>
+      <div class="feature-card">
+        <div class="ico">👤</div>
+        <h3>Perfil y creaciones</h3>
+        <p>Edita tu perfil, sigue a otras personas y revisa tu espacio usado.</p>
       </div>
       <div class="feature-card">
         <div class="ico">🔍</div>
@@ -63,109 +69,23 @@
       </div>
     </div>
 
-    <!-- Setup guide -->
-    <h2>⚙️ Guía de configuración (Supabase)</h2>
+    <h2>🔐 Acceso</h2>
     <p>
-      Better Discovery es un <strong style="color:var(--text-primary)">sitio estático</strong> que usa
-      <a href="https://supabase.com" target="_blank" rel="noopener" style="color:var(--accent)">Supabase</a>
-      como backend. Necesitas un proyecto gratuito de Supabase para que funcione por completo.
+      Usa la pantalla de <a href="login.html" style="color:var(--accent)">Login</a> para entrar con tu cuenta
+      y luego explora, sube, comenta y administra tu perfil.
     </p>
-
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-body">
-        <h3>Crea un proyecto gratuito de Supabase</h3>
-        <p>Ve a <a href="https://supabase.com" target="_blank" rel="noopener">supabase.com</a>,
-           regístrate (es gratis) y crea un proyecto nuevo. Espera a que termine de aprovisionarse.</p>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-body">
-        <h3>Ejecuta el esquema SQL</h3>
-        <p>
-          En el panel de Supabase, ve a <strong>SQL Editor → New query</strong>,
-          pega el bloque de abajo y haz clic en <strong>Run</strong>.
-        </p>
-      </div>
-    </div>
-
-<div class="code-block">-- Better Discovery — database schema
-
-CREATE TABLE IF NOT EXISTS snippets (
-  id           UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
-  title        TEXT        NOT NULL,
-  description  TEXT        NOT NULL DEFAULT '',
-  html_content TEXT        NOT NULL,
-  author       TEXT        NOT NULL DEFAULT 'Anonymous',
-  tag          TEXT,
-  likes        INTEGER     NOT NULL DEFAULT 0,
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS comments (
-  id          UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
-  snippet_id  UUID        NOT NULL REFERENCES snippets(id) ON DELETE CASCADE,
-  author      TEXT        NOT NULL DEFAULT 'Anonymous',
-  content     TEXT        NOT NULL,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Enable Row-Level Security
-ALTER TABLE snippets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
-
--- Snippets: anyone can read and insert; anyone can update likes
-CREATE POLICY "Public read snippets"   ON snippets FOR SELECT USING (true);
-CREATE POLICY "Public insert snippets" ON snippets FOR INSERT WITH CHECK (true);
-CREATE POLICY "Public update likes"    ON snippets FOR UPDATE USING (true)
-  WITH CHECK (true);
-
--- Comments: anyone can read and insert
-CREATE POLICY "Public read comments"   ON comments FOR SELECT USING (true);
-CREATE POLICY "Public insert comments" ON comments FOR INSERT WITH CHECK (true);</div>
-
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-body">
-        <h3>Copia tus credenciales de API</h3>
-        <p>En el panel de Supabase ve a <strong>Project Settings → API</strong>.
-           Copia la <em>Project URL</em> y la clave <em>anon / pública</em>.</p>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-body">
-        <h3>Añade las credenciales en <code style="font-size:0.9em;background:var(--bg-card);padding:2px 7px;border-radius:5px;color:var(--accent)">js/config.js</code></h3>
-        <p>Abre el archivo y reemplaza los valores de ejemplo:</p>
-      </div>
-    </div>
-
-<div class="code-block">const SUPABASE_URL      = 'https://abcdefghij.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGc...(your anon key)...';</div>
-
-    <div class="step">
-      <div class="step-num">5</div>
-      <div class="step-body">
-        <h3>Despliega en GitHub Pages</h3>
-        <p>
-          Sube el repositorio a GitHub y luego ve a <strong>Settings → Pages</strong>,
-          define como origen la rama <em>main</em> y la carpeta raíz, y guarda.
-          Tu sitio quedará en <code style="font-size:0.9em;background:var(--bg-card);padding:2px 7px;border-radius:5px;color:var(--accent)">https://&lt;user&gt;.github.io/&lt;repo&gt;</code>.
-        </p>
-      </div>
-    </div>
 
     <!-- Pages overview -->
     <h2>📄 Páginas</h2>
-    <p>El proyecto contiene cuatro páginas:</p>
+    <p>El proyecto contiene varias páginas:</p>
     <ul style="color:var(--text-muted);padding-left:20px;line-height:2">
       <li><strong style="color:var(--text-primary)">index.html</strong> — Explora y descubre todas las creaciones HTML</li>
       <li><strong style="color:var(--text-primary)">upload.html</strong> — Sube una nueva creación HTML (hasta 1 MB)</li>
       <li><strong style="color:var(--text-primary)">view.html?id=…</strong> — Visualiza, da like y comenta una creación</li>
-      <li><strong style="color:var(--text-primary)">about.html</strong> — Esta página: resumen de funciones y configuración</li>
+      <li><strong style="color:var(--text-primary)">profile.html</strong> — Edita tu perfil, ve tus creaciones y seguidores</li>
+      <li><strong style="color:var(--text-primary)">about.html</strong> — Esta página: resumen del proyecto</li>
+      <li><strong style="color:var(--text-primary)">terms.html</strong> — Términos y condiciones</li>
+      <li><strong style="color:var(--text-primary)">privacy.html</strong> — Política de privacidad</li>
     </ul>
 
     <!-- Tech stack -->
@@ -173,7 +93,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGc...(your anon key)...';</div>
     <p>
       HTML + CSS + JavaScript puro (sin build tools ni frameworks) y
       <a href="https://supabase.com" target="_blank" rel="noopener" style="color:var(--accent)">Supabase</a>
-      para la base de datos. Hospedado gratis en
+      para autenticación y persistencia. Todo está pensado para alojarse en
       <a href="https://pages.github.com" target="_blank" rel="noopener" style="color:var(--accent)">GitHub Pages</a>.
     </p>
 
@@ -182,7 +102,6 @@ const SUPABASE_ANON_KEY = 'eyJhbGc...(your anon key)...';</div>
     <p>
       Todo el HTML subido se ejecuta dentro de un <code style="background:var(--bg-card);padding:2px 6px;border-radius:4px;color:var(--accent)">&lt;iframe&gt;</code> con sandbox
       usando un atributo <code style="background:var(--bg-card);padding:2px 6px;border-radius:4px;color:var(--accent)">sandbox</code> restringido.
-      Los scripts se ejecutan en un origen nulo único — no pueden acceder a cookies, localStorage ni DOM de la página padre.
     </p>
 
     <div style="margin-top:48px;padding-top:24px;border-top:1px solid var(--border);color:var(--text-muted);font-size:0.85rem;text-align:center">
@@ -190,11 +109,25 @@ const SUPABASE_ANON_KEY = 'eyJhbGc...(your anon key)...';</div>
       <a href="https://github.com" style="color:var(--accent)">GitHub</a>
     </div>
 
+    <footer class="site-footer">
+      <a href="terms.html">Términos y condiciones</a>
+      <span>·</span>
+      <a href="privacy.html">Política de privacidad</a>
+    </footer>
+
   </div>
 
   <!-- Scripts (mínimos: esta página no hace consultas a la base de datos) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
+  <script>
+    async function initPage() {
+      await requireAuth({ redirect: false });
+      await renderAuthNav();
+    }
+
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
 </body>
 </html>

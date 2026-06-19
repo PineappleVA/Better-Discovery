@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy – Better Discovery</title>
+  <meta name="description" content="Política de privacidad de Better Discovery.">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .policy-page {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 50px 24px 90px;
+    }
+
+    .policy-page h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #f0f0f0 40%, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .policy-page > p,
+    .policy-page li {
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .policy-page h2 {
+      margin-top: 34px;
+      margin-bottom: 10px;
+      font-size: 1.08rem;
+    }
+
+    .policy-box {
+      background: linear-gradient(180deg, rgba(33,33,40,0.95) 0%, rgba(23,23,28,0.95) 100%);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">🚀 Better Discovery</a>
+    <div class="nav-links">
+      <a href="index.html">Explorar</a>
+      <a href="about.html">Acerca de</a>
+      <a href="privacy.html" class="active">Privacidad</a>
+    </div>
+    <div class="nav-auth" id="navAuth"></div>
+  </nav>
+
+  <main class="policy-page">
+    <h1>Política de privacidad</h1>
+    <p>Última actualización: 19 de junio de 2026.</p>
+    <p>
+      Esta política describe qué datos puede tratar Better Discovery, por qué se usan y qué control tienes sobre ellos.
+      El sitio está pensado para funcionar en GitHub Pages y utiliza servicios externos para autenticación, almacenamiento y distribución de contenido.
+    </p>
+
+    <div class="policy-box">
+      <h2>1. Datos que puedes compartir</h2>
+      <p>
+        Según cómo uses la app, puedes proporcionar email de acceso, nombre público, biografía, creaciones HTML, comentarios,
+        autores seguidos y preferencias guardadas en el navegador.
+      </p>
+
+      <h2>2. Datos generados por el uso</h2>
+      <p>
+        El sitio puede registrar información técnica necesaria para funcionar, como sesiones activas, identificadores internos,
+        preferencias locales y el estado de elementos visibles de la interfaz. También puede almacenar metadatos de las creaciones
+        para mostrar autor, fecha, likes y comentarios.
+      </p>
+
+      <h2>3. Finalidad del tratamiento</h2>
+      <ul>
+        <li>Autenticar usuarios y mantener sesiones.</li>
+        <li>Publicar y mostrar creaciones HTML.</li>
+        <li>Guardar comentarios, likes y perfiles visibles.</li>
+        <li>Permitir seguimiento entre personas usuarias y calcular el espacio usado.</li>
+        <li>Mejorar la seguridad, moderación y experiencia de navegación.</li>
+      </ul>
+
+      <h2>4. Conservación</h2>
+      <p>
+        Conservamos el contenido mientras sea útil para prestar el servicio o hasta que se elimine según las reglas del proyecto
+        o las capacidades de los sistemas externos usados. Parte de tu configuración se guarda localmente en tu navegador.
+      </p>
+
+      <h2>5. Cookies y almacenamiento local</h2>
+      <p>
+        Better Discovery puede usar almacenamiento local del navegador para recordar tu perfil público, a quién sigues,
+        qué has marcado como propio y qué contenido has valorado. Puedes borrar estos datos desde la configuración de tu navegador.
+      </p>
+
+      <h2>6. Terceros</h2>
+      <p>
+        El sitio utiliza servicios de terceros como GitHub Pages y Supabase. Cada proveedor puede tratar datos de acuerdo con
+        sus propias políticas y condiciones. Te recomendamos revisar la documentación de dichos servicios.
+      </p>
+
+      <h2>7. Tus derechos</h2>
+      <p>
+        Puedes pedir acceso, corrección o eliminación de tu contenido cuando el diseño del sistema lo permita.
+        También puedes dejar de usar la cuenta, limpiar el almacenamiento local o contactar con el proyecto para plantear una revisión.
+      </p>
+
+      <h2>8. Seguridad</h2>
+      <p>
+        El HTML de las creaciones se muestra dentro de iframes con sandbox para reducir el impacto de contenido no confiable.
+        Aun así, ningún sistema puede garantizar seguridad absoluta, por lo que debes publicar contenido responsable.
+      </p>
+
+      <h2>9. Menores</h2>
+      <p>
+        Si el proyecto se usa por menores de edad, debe hacerse bajo supervisión de una persona adulta cuando sea necesario
+        y respetando las leyes aplicables en cada jurisdicción.
+      </p>
+
+      <h2>10. Cambios</h2>
+      <p>
+        Podemos actualizar esta política para reflejar cambios técnicos, legales o de producto. La versión publicada aquí
+        será la referencia principal.
+      </p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <a href="terms.html">Términos y condiciones</a>
+    <span>·</span>
+    <a href="about.html">Acerca de</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    async function initPage() {
+      await requireAuth({ redirect: false });
+      await renderAuthNav();
+    }
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>

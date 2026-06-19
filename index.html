@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Better Discovery – Descubre creaciones HTML</title>
+  <title>Better Discovery</title>
   <meta name="description" content="Comparte y descubre creaciones HTML interactivas. Sube tu HTML y deja que otros lo vean, den like y comenten.">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -17,6 +17,7 @@
       <a href="about.html">Acerca de</a>
       <a href="upload.html" class="btn btn-primary">+ Subir</a>
     </div>
+    <div class="nav-auth" id="navAuth"></div>
   </nav>
 
   <!-- ── Hero ── -->
@@ -56,6 +57,12 @@
     <div id="pagination" class="pagination"></div>
 
   </div>
+
+  <footer class="site-footer">
+    <a href="terms.html">Términos y condiciones</a>
+    <span>·</span>
+    <a href="privacy.html">Política de privacidad</a>
+  </footer>
 
   <!-- ── Scripts ── -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -189,7 +196,13 @@
       loadSnippets();
     });
 
-    loadSnippets();
+    async function initPage() {
+      await requireAuth({ redirect: false });
+      await renderAuthNav();
+      loadSnippets();
+    }
+
+    document.addEventListener('DOMContentLoaded', initPage);
   </script>
 </body>
 </html>
