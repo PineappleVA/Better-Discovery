@@ -4,6 +4,7 @@
 
 /* ── Supabase client ── */
 let supabaseClient = null;
+const DEFAULT_AUTHOR_NAME = 'Anónimo';
 
 if (IS_CONFIGURED) {
   supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -67,7 +68,7 @@ function escapeHtml(str) {
 
 function getProfileInitial(name) {
   const value = String(name || '').trim();
-  return value ? value[0].toUpperCase() : 'A';
+  return value ? value[0].toUpperCase() : DEFAULT_AUTHOR_NAME[0].toUpperCase();
 }
 
 /* ── Likes (stored in localStorage) ── */

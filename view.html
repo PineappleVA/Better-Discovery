@@ -198,9 +198,10 @@
 
       document.getElementById('snippetTitle').textContent  = s.title;
       document.getElementById('snippetDesc').textContent   = s.description || '';
-      const author = s.author || 'Anónimo';
+      const author = s.author || DEFAULT_AUTHOR_NAME;
       document.getElementById('snippetAuthor').textContent = author;
-      document.getElementById('snippetAuthorInitial').textContent = getProfileInitial(author);
+      const authorInitialEl = document.getElementById('snippetAuthorInitial');
+      if (authorInitialEl) authorInitialEl.textContent = getProfileInitial(author);
       document.getElementById('snippetDate').textContent   = formatDate(s.created_at);
 
       if (s.tag) {
@@ -246,8 +247,8 @@
       list.innerHTML = comments.map(c => `
         <div class="comment">
           <div class="comment-header">
-            <span class="profile-dot">${escapeHtml(getProfileInitial(c.author || 'Anónimo'))}</span>
-            <div class="comment-author">${escapeHtml(c.author || 'Anónimo')}</div>
+            <span class="profile-dot">${escapeHtml(getProfileInitial(c.author || DEFAULT_AUTHOR_NAME))}</span>
+            <div class="comment-author">${escapeHtml(c.author || DEFAULT_AUTHOR_NAME)}</div>
           </div>
           <div class="comment-body">${escapeHtml(c.content)}</div>
           <div class="comment-time">${timeAgo(c.created_at)}</div>
@@ -257,7 +258,7 @@
     }
 
     async function submitComment() {
-      const author  = document.getElementById('commentAuthor').value.trim() || 'Anónimo';
+      const author  = document.getElementById('commentAuthor').value.trim() || DEFAULT_AUTHOR_NAME;
       const content = document.getElementById('commentText').value.trim();
 
       if (!content) { showToast('El comentario no puede estar vacío.', 'error'); return; }

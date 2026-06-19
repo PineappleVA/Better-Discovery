@@ -70,7 +70,7 @@
 
     /* ── Render a card ── */
     function renderCard(s, idx) {
-      const author = s.author || 'Anónimo';
+      const author = s.author || DEFAULT_AUTHOR_NAME;
       return `
         <a href="view.html?id=${encodeURIComponent(s.id)}" class="snippet-card reveal" style="--i:${idx % 8}">
           <div class="card-thumb">🌐</div>
