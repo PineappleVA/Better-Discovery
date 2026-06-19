@@ -56,12 +56,12 @@ async function renderAuthNav() {
   }
 
   const profile = getProfileData();
-  const email = profile.displayName || session.user?.email || DEFAULT_AUTHOR_NAME;
+  const displayLabel = profile.displayName || session.user?.email || DEFAULT_AUTHOR_NAME;
   const profileLink = window.location.pathname.endsWith('/profile.html') || window.location.pathname.endsWith('/profile')
     ? ''
     : `<a href="${PROFILE_PAGE}" class="btn btn-outline">Perfil</a>`;
   navAuth.innerHTML = `
-    <span class="user-label">${escapeHtml(email)}</span>
+    <span class="user-label">${escapeHtml(displayLabel)}</span>
     ${profileLink}
     <button type="button" class="btn btn-outline" id="logoutBtn">Salir</button>
   `;
