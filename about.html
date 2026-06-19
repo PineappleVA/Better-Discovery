@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About – Better Discovery</title>
+  <meta name="description" content="About Better Discovery and how to set it up with Supabase.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="index.html" class="nav-logo">🚀 Better Discovery</a>
+    <div class="nav-links">
+      <a href="index.html">Browse</a>
+      <a href="about.html" class="active">About</a>
+      <a href="upload.html" class="btn btn-primary">+ Upload</a>
+    </div>
+  </nav>
+
+  <div class="about-page">
+
+    <h1>About Better Discovery</h1>
+    <p>
+      Better Discovery is an open, community-driven gallery for HTML creations.
+      Upload your HTML pages, interactive demos, games, or tools and let anyone in the world
+      view, play with, like, and comment on them — <strong style="color:var(--text-primary)">no programming required</strong> to enjoy them.
+    </p>
+
+    <!-- Features -->
+    <h2>✨ Features</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="ico">📤</div>
+        <h3>Upload HTML</h3>
+        <p>Paste up to 1 MB of HTML code and publish it instantly.</p>
+      </div>
+      <div class="feature-card">
+        <div class="ico">🖥️</div>
+        <h3>Live Preview</h3>
+        <p>Every creation runs in a sandboxed iframe — scripts included.</p>
+      </div>
+      <div class="feature-card">
+        <div class="ico">❤️</div>
+        <h3>Likes</h3>
+        <p>Show appreciation for your favorite creations with a single click.</p>
+      </div>
+      <div class="feature-card">
+        <div class="ico">💬</div>
+        <h3>Comments</h3>
+        <p>Leave feedback, questions, or praise for creators.</p>
+      </div>
+      <div class="feature-card">
+        <div class="ico">🔍</div>
+        <h3>Search</h3>
+        <p>Find creations by title or description with instant search.</p>
+      </div>
+      <div class="feature-card">
+        <div class="ico">📱</div>
+        <h3>Responsive</h3>
+        <p>Works on desktop, tablet, and mobile devices.</p>
+      </div>
+    </div>
+
+    <!-- Setup guide -->
+    <h2>⚙️ Setup Guide (Supabase)</h2>
+    <p>
+      Better Discovery is a <strong style="color:var(--text-primary)">static site</strong> that uses
+      <a href="https://supabase.com" target="_blank" rel="noopener" style="color:var(--accent)">Supabase</a>
+      as its backend. You need a free Supabase project to make it fully functional.
+    </p>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Create a free Supabase project</h3>
+        <p>Go to <a href="https://supabase.com" target="_blank" rel="noopener">supabase.com</a>,
+           sign up (it's free), and create a new project. Wait for it to finish provisioning.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Run the SQL schema</h3>
+        <p>
+          In your Supabase dashboard, go to <strong>SQL Editor → New query</strong>,
+          paste the snippet below, and click <strong>Run</strong>.
+        </p>
+      </div>
+    </div>
+
+<div class="code-block">-- Better Discovery — database schema
+
+CREATE TABLE IF NOT EXISTS snippets (
+  id           UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
+  title        TEXT        NOT NULL,
+  description  TEXT        NOT NULL DEFAULT '',
+  html_content TEXT        NOT NULL,
+  author       TEXT        NOT NULL DEFAULT 'Anonymous',
+  tag          TEXT,
+  likes        INTEGER     NOT NULL DEFAULT 0,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS comments (
+  id          UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
+  snippet_id  UUID        NOT NULL REFERENCES snippets(id) ON DELETE CASCADE,
+  author      TEXT        NOT NULL DEFAULT 'Anonymous',
+  content     TEXT        NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Enable Row-Level Security
+ALTER TABLE snippets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
+
+-- Snippets: anyone can read and insert; anyone can update likes
+CREATE POLICY "Public read snippets"   ON snippets FOR SELECT USING (true);
+CREATE POLICY "Public insert snippets" ON snippets FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public update likes"    ON snippets FOR UPDATE USING (true)
+  WITH CHECK (true);
+
+-- Comments: anyone can read and insert
+CREATE POLICY "Public read comments"   ON comments FOR SELECT USING (true);
+CREATE POLICY "Public insert comments" ON comments FOR INSERT WITH CHECK (true);</div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Copy your API credentials</h3>
+        <p>In the Supabase dashboard go to <strong>Project Settings → API</strong>.
+           Copy the <em>Project URL</em> and the <em>anon / public</em> key.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Add credentials to <code style="font-size:0.9em;background:var(--bg-card);padding:2px 7px;border-radius:5px;color:var(--accent)">js/config.js</code></h3>
+        <p>Open the file and replace the placeholder values:</p>
+      </div>
+    </div>
+
+<div class="code-block">const SUPABASE_URL      = 'https://abcdefghij.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGc...(your anon key)...';</div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>Deploy to GitHub Pages</h3>
+        <p>
+          Push the repository to GitHub, then go to <strong>Settings → Pages</strong>,
+          set the source to your <em>main</em> branch and root folder, and save.
+          Your site will be live at <code style="font-size:0.9em;background:var(--bg-card);padding:2px 7px;border-radius:5px;color:var(--accent)">https://&lt;user&gt;.github.io/&lt;repo&gt;</code>.
+        </p>
+      </div>
+    </div>
+
+    <!-- Pages overview -->
+    <h2>📄 Pages</h2>
+    <p>The project contains four pages:</p>
+    <ul style="color:var(--text-muted);padding-left:20px;line-height:2">
+      <li><strong style="color:var(--text-primary)">index.html</strong> — Browse & discover all HTML creations</li>
+      <li><strong style="color:var(--text-primary)">upload.html</strong> — Upload a new HTML creation (up to 1 MB)</li>
+      <li><strong style="color:var(--text-primary)">view.html?id=…</strong> — View, like and comment on a specific creation</li>
+      <li><strong style="color:var(--text-primary)">about.html</strong> — This page: feature overview and setup guide</li>
+    </ul>
+
+    <!-- Tech stack -->
+    <h2>🛠️ Tech Stack</h2>
+    <p>
+      Plain HTML + CSS + JavaScript (no build tools, no frameworks) and
+      <a href="https://supabase.com" target="_blank" rel="noopener" style="color:var(--accent)">Supabase</a>
+      for the database. Hosted for free on
+      <a href="https://pages.github.com" target="_blank" rel="noopener" style="color:var(--accent)">GitHub Pages</a>.
+    </p>
+
+    <!-- Security note -->
+    <h2>🔒 Security</h2>
+    <p>
+      All uploaded HTML runs inside a sandboxed <code style="background:var(--bg-card);padding:2px 6px;border-radius:4px;color:var(--accent)">&lt;iframe&gt;</code>
+      with a restricted <code style="background:var(--bg-card);padding:2px 6px;border-radius:4px;color:var(--accent)">sandbox</code> attribute.
+      Scripts run in a unique null origin — they cannot access the parent page's cookies, localStorage, or DOM.
+    </p>
+
+    <div style="margin-top:48px;padding-top:24px;border-top:1px solid var(--border);color:var(--text-muted);font-size:0.85rem;text-align:center">
+      Built with ❤️ · Open-source on
+      <a href="https://github.com" style="color:var(--accent)">GitHub</a>
+    </div>
+
+  </div>
+
+  <!-- Scripts (minimal – no DB calls on this page) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

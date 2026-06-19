@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload HTML – Better Discovery</title>
+  <meta name="description" content="Share your HTML creation with the world. Upload up to 1 MB of HTML code.">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .preview-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .preview-toggle button {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      padding: 4px 12px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .preview-toggle button:hover { border-color: var(--accent); color: var(--accent); }
+
+    #livePreview {
+      width: 100%;
+      height: 340px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: #fff;
+      display: none;
+    }
+
+    .progress-bar-wrap {
+      height: 4px;
+      background: var(--border);
+      border-radius: 4px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    .upload-success {
+      text-align: center;
+      padding: 60px 24px;
+    }
+
+    .upload-success .check {
+      font-size: 4rem;
+      margin-bottom: 16px;
+    }
+
+    .upload-success h2 { font-size: 1.6rem; margin-bottom: 10px; }
+    .upload-success p  { color: var(--text-muted); margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="index.html" class="nav-logo">🚀 Better Discovery</a>
+    <div class="nav-links">
+      <a href="index.html">Browse</a>
+      <a href="about.html">About</a>
+      <a href="upload.html" class="btn btn-primary active">+ Upload</a>
+    </div>
+  </nav>
+
+  <!-- Form -->
+  <div class="form-page" id="formPage">
+    <div class="page-header">
+      <h1 class="page-title">Upload HTML Creation</h1>
+      <p class="page-sub">Paste your HTML code (up to 1 MB). Others will be able to view and interact with it — no coding required.</p>
+    </div>
+
+    <div id="configWarning" style="display:none" class="config-notice" style="margin-bottom:24px">
+      ⚙️ Supabase is not configured yet. Open <code>js/config.js</code> and add your credentials, then run the SQL schema.
+      See the <a href="about.html" style="color:var(--accent)">About / Setup</a> page for instructions.
+    </div>
+
+    <form id="uploadForm" novalidate>
+
+      <!-- Title -->
+      <div class="form-group">
+        <label class="form-label" for="title">
+          Title <span class="hint">required</span>
+        </label>
+        <input id="title" class="form-input" type="text" maxlength="120"
+               placeholder="My awesome HTML project" required>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label class="form-label" for="description">Description</label>
+        <textarea id="description" class="form-textarea" maxlength="500" rows="3"
+                  placeholder="What does your creation do? What can visitors interact with?"></textarea>
+      </div>
+
+      <!-- Author + optional tag -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="author">Your name / handle</label>
+          <input id="author" class="form-input" type="text" maxlength="60" placeholder="Anonymous">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="tag">Category <span class="hint">optional</span></label>
+          <select id="tag" class="form-input">
+            <option value="">— none —</option>
+            <option value="game">🎮 Game</option>
+            <option value="art">🎨 Art / Animation</option>
+            <option value="tool">🛠️ Tool / Utility</option>
+            <option value="demo">📐 Demo / Experiment</option>
+            <option value="interactive">🖱️ Interactive</option>
+            <option value="other">📦 Other</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- HTML code -->
+      <div class="form-group">
+        <div class="preview-toggle">
+          <label class="form-label" for="htmlCode" style="margin:0;flex:1">
+            HTML Code <span class="hint">required · max 1 MB</span>
+          </label>
+          <button type="button" id="togglePreview">👁 Preview</button>
+        </div>
+
+        <textarea id="htmlCode" class="form-textarea code-textarea" spellcheck="false"
+                  placeholder="<!DOCTYPE html>&#10;<html>&#10;  <head><title>My Creation</title></head>&#10;  <body>&#10;    <h1>Hello World!</h1>&#10;  </body>&#10;</html>"></textarea>
+
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="sizeBar" style="width:0%"></div>
+        </div>
+        <div class="size-bar" id="sizeLabel">0 B / 1 MB</div>
+
+        <!-- Sandbox: allow-scripts without allow-same-origin keeps the preview in a null
+             origin, preventing any access to the parent page's DOM/cookies/localStorage. -->
+        <iframe id="livePreview"
+                sandbox="allow-scripts allow-forms allow-modals allow-popups"
+                title="Live preview"></iframe>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" id="submitBtn">🚀 Publish</button>
+        <a href="index.html" class="btn btn-outline">Cancel</a>
+        <span id="submitStatus" style="font-size:0.85rem;color:var(--text-muted);margin-left:auto"></span>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Success state (hidden initially) -->
+  <div id="successPage" class="form-page" style="display:none">
+    <div class="upload-success">
+      <div class="check">🎉</div>
+      <h2>Published!</h2>
+      <p>Your creation is live and ready to be discovered.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a id="viewLink" href="#" class="btn btn-primary">View my creation →</a>
+        <a href="upload.html" class="btn btn-outline">Upload another</a>
+        <a href="index.html" class="btn btn-outline">Browse all</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const MAX_BYTES = 1 * 1024 * 1024; // 1 MB
+    let previewVisible = false;
+
+    /* ── Show config warning ── */
+    if (!IS_CONFIGURED) {
+      document.getElementById('configWarning').style.display = 'block';
+      document.getElementById('submitBtn').disabled = true;
+    }
+
+    /* ── Size indicator ── */
+    function updateSizeIndicator() {
+      const code  = document.getElementById('htmlCode').value;
+      const bytes = new TextEncoder().encode(code).length;
+      const pct   = (bytes / MAX_BYTES) * 100;
+
+      const bar   = document.getElementById('sizeBar');
+      const label = document.getElementById('sizeLabel');
+
+      bar.style.width = Math.min(pct, 100) + '%';
+
+      if (bytes > MAX_BYTES) {
+        bar.style.background    = 'var(--danger)';
+        label.className         = 'size-bar error';
+        label.textContent       = `${bytesToSize(bytes)} / 1 MB — exceeds limit!`;
+      } else if (pct > 80) {
+        bar.style.background    = '#f59e0b';
+        label.className         = 'size-bar warn';
+        label.textContent       = `${bytesToSize(bytes)} / 1 MB`;
+      } else {
+        bar.style.background    = 'var(--accent)';
+        label.className         = 'size-bar';
+        label.textContent       = `${bytesToSize(bytes)} / 1 MB`;
+      }
+    }
+
+    document.getElementById('htmlCode').addEventListener('input', () => {
+      updateSizeIndicator();
+      if (previewVisible) refreshPreview();
+    });
+
+    /* ── Live preview toggle ── */
+    const previewIframe = document.getElementById('livePreview');
+
+    function refreshPreview() {
+      const code = document.getElementById('htmlCode').value;
+      previewIframe.srcdoc = code || '<p style="color:#888;font-family:sans-serif;padding:20px">Your HTML will appear here…</p>';
+    }
+
+    document.getElementById('togglePreview').addEventListener('click', () => {
+      previewVisible = !previewVisible;
+      previewIframe.style.display = previewVisible ? 'block' : 'none';
+      document.getElementById('togglePreview').textContent = previewVisible ? '✏️ Editor' : '👁 Preview';
+      if (previewVisible) refreshPreview();
+    });
+
+    /* ── Form submit ── */
+    document.getElementById('uploadForm').addEventListener('submit', async e => {
+      e.preventDefault();
+
+      if (!IS_CONFIGURED) {
+        showToast('Configure Supabase credentials first.', 'error');
+        return;
+      }
+
+      const title    = document.getElementById('title').value.trim();
+      const desc     = document.getElementById('description').value.trim();
+      const author   = document.getElementById('author').value.trim() || 'Anonymous';
+      const tag      = document.getElementById('tag').value;
+      const htmlCode = document.getElementById('htmlCode').value;
+
+      /* Validation */
+      if (!title) { showToast('Please add a title.', 'error'); document.getElementById('title').focus(); return; }
+      if (!htmlCode.trim()) { showToast('HTML code cannot be empty.', 'error'); document.getElementById('htmlCode').focus(); return; }
+
+      const bytes = new TextEncoder().encode(htmlCode).length;
+      if (bytes > MAX_BYTES) { showToast('HTML exceeds the 1 MB limit.', 'error'); return; }
+
+      /* Submit */
+      const btn    = document.getElementById('submitBtn');
+      const status = document.getElementById('submitStatus');
+      btn.disabled     = true;
+      btn.textContent  = '⏳ Publishing…';
+      status.textContent = '';
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('snippets')
+          .insert([{ title, description: desc, author, tag: tag || null, html_content: htmlCode }])
+          .select('id')
+          .single();
+
+        if (error) throw error;
+
+        /* Show success */
+        document.getElementById('formPage').style.display    = 'none';
+        document.getElementById('successPage').style.display = 'block';
+        document.getElementById('viewLink').href = `view.html?id=${encodeURIComponent(data.id)}`;
+
+      } catch (err) {
+        showToast(`Error: ${err.message}`, 'error', 6000);
+        btn.disabled    = false;
+        btn.textContent = '🚀 Publish';
+        status.textContent = '';
+      }
+    });
+  </script>
+</body>
+</html>
