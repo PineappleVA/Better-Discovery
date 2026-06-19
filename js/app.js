@@ -42,7 +42,7 @@ function timeAgo(dateStr) {
 }
 
 function formatDate(dateStr) {
-  return new Date(dateStr).toLocaleDateString('es-ES', {
+  return new Date(dateStr).toLocaleDateString('es', {
     year: 'numeric', month: 'short', day: 'numeric'
   });
 }
