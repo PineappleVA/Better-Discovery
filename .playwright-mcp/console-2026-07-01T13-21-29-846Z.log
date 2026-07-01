@@ -1,0 +1,1 @@
+[   22205ms] [ERROR] Failed to load resource: the server responded with a status of 406 () @ https://onfgppojanfagdccvrcy.supabase.co/rest/v1/snippets?select=*&id=eq.null:0

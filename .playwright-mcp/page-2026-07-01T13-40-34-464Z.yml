@@ -1,0 +1,42 @@
+- generic [active] [ref=f1e1]:
+  - navigation [ref=f1e2]:
+    - link "🚀 Better Discovery" [ref=f1e3] [cursor=pointer]:
+      - /url: index.html
+    - generic [ref=f1e4]:
+      - link "Explorar" [ref=f1e5] [cursor=pointer]:
+        - /url: index.html
+      - link "Acerca de" [ref=f1e6] [cursor=pointer]:
+        - /url: about.html
+      - link "+ Subir" [ref=f1e7] [cursor=pointer]:
+        - /url: upload.html
+    - generic [ref=f1e8]:
+      - generic [ref=f1e9]:
+        - text: Anónimo
+        - generic "Moderador" [ref=f1e10]: 🛡️ jaimegamingpro
+      - link "Perfil" [ref=f1e11] [cursor=pointer]:
+        - /url: profile.html
+      - button "Salir" [ref=f1e12] [cursor=pointer]
+  - link "Ver repositorio en GitHub" [ref=f1e13] [cursor=pointer]:
+    - /url: https://github.com/jaime-developer/Better-Discovery
+    - img [ref=f1e14]
+  - generic [ref=f1e18]:
+    - heading "Descubre creaciones HTML" [level=1] [ref=f1e19]
+    - paragraph [ref=f1e20]: Sube tus proyectos HTML y deja que cualquiera los vea, interactúe, reaccione y comente — sin programar.
+    - link "Comparte tu HTML ✨" [ref=f1e21] [cursor=pointer]:
+      - /url: upload.html
+  - generic [ref=f1e22]:
+    - generic [ref=f1e23]:
+      - img
+      - searchbox "Busca por título o descripción…" [ref=f1e24]
+    - generic [ref=f1e25]:
+      - heading "✨ Últimas creaciones" [level=2] [ref=f1e26]
+      - combobox "Ordenar por" [ref=f1e27] [cursor=pointer]:
+        - option "Más recientes" [selected]
+        - option "Más valoradas"
+    - generic [ref=f1e29]: Cargando…
+  - contentinfo [ref=f1e31]:
+    - link "Términos y condiciones" [ref=f1e32] [cursor=pointer]:
+      - /url: terms.html
+    - generic [ref=f1e33]: ·
+    - link "Política de privacidad" [ref=f1e34] [cursor=pointer]:
+      - /url: privacy.html
