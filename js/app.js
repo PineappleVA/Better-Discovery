@@ -360,7 +360,6 @@ if (typeof window !== 'undefined') {
     renderAuthNav,
     toggleFollowAuthor,
     getFollowedAuthors,
-    removeFollow,
     showToast,
     formatDate,
     bytesToSize,
