@@ -11,7 +11,9 @@
     .mod-header h1 { font-size: clamp(1.7rem, 3vw, 2.4rem); letter-spacing: -.02em; }
     .mod-status { color: var(--text-muted); font-size: .9rem; }
     .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
-    .snippet-row { display:grid; grid-template-columns: 1fr auto auto auto; gap: 14px; align-items: center; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; transition: border-color .2s; }
+    .toolbar input, .toolbar select { background: rgba(20,20,26,.9); border:1px solid var(--border); color: var(--text-primary); padding:10px 12px; border-radius:10px; font-size:.9rem; outline:none; }
+    .toolbar input:focus, .toolbar select:focus { border-color: var(--accent); }
+    .snippet-row { display:grid; grid-template-columns: 1fr auto auto auto auto; gap: 14px; align-items: center; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; transition: border-color .2s; }
     .snippet-row:hover { border-color: var(--accent); }
     .snippet-row .title { font-weight: 600; }
     .snippet-row .meta { color: var(--text-muted); font-size: .85rem; }
@@ -21,6 +23,8 @@
     .edit-panel .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .edit-panel textarea { font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace; font-size: .84rem; min-height: 220px; }
     .row-actions { display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; margin-top:12px; }
+    .badge { display:inline-flex; align-items:center; gap:6px; background: rgba(99,102,241,.15); border:1px solid rgba(99,102,241,.35); color:#c7d2fe; padding:3px 8px; border-radius:999px; font-size:.78rem; }
+    .stat { color: var(--text-muted); font-size:.82rem; }
   </style>
 </head>
 <body>
@@ -41,11 +45,27 @@
         <div class="mod-status" id="modStatus">Comprobando permisos…</div>
       </div>
       <div class="toolbar">
+        <input type="search" id="searchInput" placeholder="Buscar por título o autor…" />
+        <select id="tagFilter">
+          <option value="">Todas las categorías</option>
+          <option value="game">🎮 Juego</option>
+          <option value="art">🎨 Arte</option>
+          <option value="tool">🛠️ Herramienta</option>
+          <option value="demo">📐 Demo</option>
+          <option value="interactive">🖱️ Interactivo</option>
+          <option value="other">📦 Otro</option>
+        </select>
+        <select id="sortSelect">
+          <option value="created_at">Más recientes</option>
+          <option value="likes">Más valoradas</option>
+          <option value="title">Alfabéticamente</option>
+        </select>
         <button class="btn btn-primary" id="refreshBtn">⟳ Actualizar</button>
       </div>
     </div>
 
     <div id="modContent"></div>
+    <div id="pagination" class="pagination" style="margin-top:16px"></div>
   </main>
 
   <footer class="site-footer">
@@ -59,38 +79,53 @@
   <script src="/Better-Discovery/js/app.js"></script>
   <script>
     let snippets = [];
-
-    function badge() {
-      const session = currentSession || null;
-      if (!session || !isModerator(session)) return '';
-      const email = (session.user?.email || '').trim().toLowerCase();
-      const display = session.user?.user_metadata?.display_name || email.split('@')[0];
-      return `<span class="mod-badge" title="Moderador">🛡️ ${escapeHtml(display)}</span>`;
-    }
+    let filtered = [];
+    let page = 0;
+    const PER_PAGE = 12;
+    let currentSort = 'created_at';
+    let currentTag = '';
+    let currentQuery = '';
 
     async function loadAll() {
       const content = document.getElementById('modContent');
-      document.getElementById('modStatus').textContent = 'Cargando…';
+      const status = document.getElementById('modStatus');
+      status.textContent = 'Cargando…';
       if (!IS_CONFIGURED || !supabaseClient) {
         content.innerHTML = configNoticeHtml();
-        document.getElementById('modStatus').textContent = 'Sin configuración.';
+        status.textContent = 'Sin configuración.';
         return;
       }
 
       try {
-        const { data, error } = await supabaseClient
+        let q = supabaseClient
           .from('snippets')
-          .select('id, title, description, author, created_at, likes, tag')
-          .order('created_at', { ascending: false });
+          .select('id, title, description, author, created_at, likes, tag, html_content', { count: 'exact' })
+          .order(currentSort, { ascending: currentSort === 'title' ? true : false });
+
+        if (currentTag) q = q.eq('tag', currentTag);
+        if (currentQuery) q = q.or(`title.ilike.%${currentQuery}%,description.ilike.%${currentQuery}%,author.ilike.%${currentQuery}%`);
+
+        const start = page * PER_PAGE;
+        const end = start + PER_PAGE - 1;
+        const { data, error, count } = await q.range(start, end);
 
         if (error) throw error;
         snippets = Array.isArray(data) ? data : [];
-        document.getElementById('modStatus').textContent = `${snippets.length} creaciones`;
+        status.textContent = `${count ?? 0} creaciones`;
         renderList();
+        renderPagination(count ?? 0);
       } catch (err) {
         content.innerHTML = `<div class="empty-state"><h3>No se pudo cargar</h3><p>Revisa la conexión con Supabase.</p></div>`;
-        document.getElementById('modStatus').textContent = 'Error';
+        status.textContent = 'Error';
       }
+    }
+
+    function applyFilters() {
+      page = 0;
+      currentQuery = (document.getElementById('searchInput')?.value || '').trim();
+      currentTag = document.getElementById('tagFilter')?.value || '';
+      currentSort = document.getElementById('sortSelect')?.value || 'created_at';
+      loadAll();
     }
 
     function renderList() {
@@ -102,11 +137,13 @@
 
       content.innerHTML = `<div style="display:flex; flex-direction:column; gap:14px">` + snippets.map((s, idx) => {
         const author = s.author || DEFAULT_AUTHOR_NAME;
+        const bytes = snippetBytes(s);
+        const sizeLabel = bytesToSize(bytes);
         return `
           <div class="snippet-row" data-id="${escapeHtml(s.id)}">
-            <div>
+            <div style="min-width:0">
               <div class="title">${escapeHtml(s.title)}</div>
-              <div class="meta">${escapeHtml(author)} · ${formatDate(s.created_at)} · ❤️ ${s.likes ?? 0} ${s.tag ? '· 🏷️ ' + escapeHtml(s.tag) : ''}</div>
+              <div class="meta">${escapeHtml(author)} · ${formatDate(s.created_at)} · ❤️ ${s.likes ?? 0} ${s.tag ? '· 🏷️ ' + escapeHtml(s.tag) : ''} · 📦 ${sizeLabel}</div>
               <div class="edit-panel" id="edit-${escapeHtml(s.id)}">
                 <div class="form-row">
                   <div class="form-group">
@@ -144,8 +181,12 @@
                 </div>
               </div>
             </div>
-            <div class="meta">${escapeHtml(s.id)}</div>
+            <div class="stat">
+              <div>ID: ${escapeHtml(s.id)}</div>
+              <div style="margin-top:4px">${sizeLabel}</div>
+            </div>
             <div style="display:flex; gap:8px; justify-content:flex-end;">
+              <a class="btn btn-outline" href="/Better-Discovery/view.html?id=${encodeURIComponent(s.id)}" target="_blank" rel="noopener">👁 Ver</a>
               <button class="btn btn-outline" data-edit="${escapeHtml(s.id)}">✏️ Editar</button>
               <button class="btn btn-outline" data-delete="${escapeHtml(s.id)}" style="border-color:rgba(239,68,68,.35);color:#f87171">🗑 Eliminar</button>
             </div>
@@ -183,6 +224,29 @@
           await deleteSnippet(id);
         });
       });
+    }
+
+    function renderPagination(total) {
+      const pages = Math.ceil(total / PER_PAGE);
+      const el = document.getElementById('pagination');
+      if (pages <= 1) { el.innerHTML = ''; return; }
+      const parts = [];
+      if (page > 0) parts.push(`<button class="page-btn" onclick="goPage(${page - 1})">← Anterior</button>`);
+      const start = Math.max(0, page - 2);
+      const end = Math.min(pages - 1, page + 2);
+      if (start > 0) parts.push(`<button class="page-btn" onclick="goPage(0)">1</button><span style="color:var(--text-muted);padding:0 4px">…</span>`);
+      for (let i = start; i <= end; i++) {
+        parts.push(`<button class="page-btn ${i === page ? 'active' : ''}" onclick="goPage(${i})">${i + 1}</button>`);
+      }
+      if (end < pages - 1) parts.push(`<span style="color:var(--text-muted);padding:0 4px">…</span><button class="page-btn" onclick="goPage(${pages - 1})">${pages}</button>`);
+      if (page < pages - 1) parts.push(`<button class="page-btn" onclick="goPage(${page + 1})">Siguiente →</button>`);
+      el.innerHTML = parts.join('');
+    }
+
+    function goPage(p) {
+      page = p;
+      loadAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async function saveSnippetEdits(id) {
@@ -240,6 +304,9 @@
 
       modStatus.textContent = 'Moderador activo';
       document.getElementById('modContent').innerHTML = '<div class="empty-state"><div class="spinner"></div>Cargando…</div>';
+      document.getElementById('searchInput')?.addEventListener('input', () => applyFilters());
+      document.getElementById('tagFilter')?.addEventListener('change', () => applyFilters());
+      document.getElementById('sortSelect')?.addEventListener('change', () => applyFilters());
       await loadAll();
     }
 
@@ -248,5 +315,6 @@
   </script>
 </body>
 </html>
+
 
 
