@@ -81,11 +81,15 @@ async function renderAuthNav() {
   const profileLink = window.location.pathname.endsWith('/profile.html') || window.location.pathname.endsWith('/profile')
     ? ''
     : `<a href="${PROFILE_PAGE}" class="btn btn-outline">Perfil</a>`;
+  const modLink = isModerator(session)
+    ? `<a href="/mod.html" class="btn btn-outline">Mod</a>`
+    : '';
   navAuth.innerHTML = `
     <span class="user-label">
       ${escapeHtml(displayLabel)}
       ${getModeratorBadgeHtml(session)}
     </span>
+    ${modLink}
     ${profileLink}
     <button type="button" class="btn btn-outline" id="logoutBtn">Salir</button>
   `;
@@ -344,4 +348,29 @@ function configNoticeHtml() {
       Revisa la configuración del proyecto y vuelve a cargar la página.<br>
       Si el problema continúa, contacta con el administrador.
     </div>`;
+}
+
+/* ── Globals used by mod.html ── */
+if (typeof window !== 'undefined') {
+  window.mod = {
+    loadAll,
+    saveSnippetEdits,
+    deleteSnippet,
+    requireAuth,
+    getSession,
+    renderAuthNav,
+    toggleFollowAuthor,
+    getFollowedAuthors,
+    removeFollow,
+    showToast,
+    formatDate,
+    bytesToSize,
+    escapeHtml,
+    getProfileInitial,
+    configNoticeHtml,
+    getModeratorBadgeHtml,
+    isModerator,
+    getSessionEmail,
+    DEFAULT_AUTHOR_NAME,
+  };
 }

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moderación – Better Discovery</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .mod-page { max-width: 1200px; margin: 0 auto; padding: 36px 24px 80px; animation: fadeUp .45s ease both; }
+    .mod-header { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:22px; flex-wrap:wrap; }
+    .mod-header h1 { font-size: clamp(1.7rem, 3vw, 2.4rem); letter-spacing: -.02em; }
+    .mod-status { color: var(--text-muted); font-size: .9rem; }
+    .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+    .snippet-row { display:grid; grid-template-columns: 1fr auto auto auto; gap: 14px; align-items: center; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; transition: border-color .2s; }
+    .snippet-row:hover { border-color: var(--accent); }
+    .snippet-row .title { font-weight: 600; }
+    .snippet-row .meta { color: var(--text-muted); font-size: .85rem; }
+    .empty-state { text-align: center; padding: 44px 12px; color: var(--text-muted); }
+    .empty-state h3 { color: var(--text-primary); margin-bottom: 8px; }
+    .edit-panel { display:none; margin-top: 10px; padding: 14px; background: rgba(99,102,241,.08); border:1px solid rgba(99,102,241,.25); border-radius: 12px; }
+    .edit-panel .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .edit-panel textarea { font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace; font-size: .84rem; min-height: 220px; }
+    .row-actions { display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; margin-top:12px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">🚀 Better Discovery</a>
+    <div class="nav-links">
+      <a href="index.html">Explorar</a>
+      <a href="docs/about.html">Acerca de</a>
+      <a href="mod.html" class="btn btn-primary">Mod</a>
+    </div>
+    <div class="nav-auth" id="navAuth"></div>
+  </nav>
+
+  <main class="mod-page">
+    <div class="mod-header">
+      <div>
+        <h1>Panel de moderación</h1>
+        <div class="mod-status" id="modStatus">Comprobando permisos…</div>
+      </div>
+      <div class="toolbar">
+        <button class="btn btn-primary" id="refreshBtn">⟳ Actualizar</button>
+      </div>
+    </div>
+
+    <div id="modContent"></div>
+  </main>
+
+  <footer class="site-footer">
+    <a href="docs/terms.html">Términos y condiciones</a>
+    <span>·</span>
+    <a href="docs/privacy.html">Política de privacidad</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let snippets = [];
+
+    function badge() {
+      const session = currentSession || null;
+      if (!session || !isModerator(session)) return '';
+      const email = (session.user?.email || '').trim().toLowerCase();
+      const display = session.user?.user_metadata?.display_name || email.split('@')[0];
+      return `<span class="mod-badge" title="Moderador">🛡️ ${escapeHtml(display)}</span>`;
+    }
+
+    async function loadAll() {
+      const content = document.getElementById('modContent');
+      document.getElementById('modStatus').textContent = 'Cargando…';
+      if (!IS_CONFIGURED || !supabaseClient) {
+        content.innerHTML = configNoticeHtml();
+        document.getElementById('modStatus').textContent = 'Sin configuración.';
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('snippets')
+          .select('id, title, description, author, created_at, likes, tag')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        snippets = Array.isArray(data) ? data : [];
+        document.getElementById('modStatus').textContent = `${snippets.length} creaciones`;
+        renderList();
+      } catch (err) {
+        content.innerHTML = `<div class="empty-state"><h3>No se pudo cargar</h3><p>Revisa la conexión con Supabase.</p></div>`;
+        document.getElementById('modStatus').textContent = 'Error';
+      }
+    }
+
+    function renderList() {
+      const content = document.getElementById('modContent');
+      if (!snippets.length) {
+        content.innerHTML = `<div class="empty-state"><h3>Aún no hay creaciones</h3><p>Cuando haya contenido aparecerá aquí.</p></div>`;
+        return;
+      }
+
+      content.innerHTML = `<div style="display:flex; flex-direction:column; gap:14px">` + snippets.map((s, idx) => {
+        const author = s.author || DEFAULT_AUTHOR_NAME;
+        return `
+          <div class="snippet-row" data-id="${escapeHtml(s.id)}">
+            <div>
+              <div class="title">${escapeHtml(s.title)}</div>
+              <div class="meta">${escapeHtml(author)} · ${formatDate(s.created_at)} · ❤️ ${s.likes ?? 0} ${s.tag ? '· 🏷️ ' + escapeHtml(s.tag) : ''}</div>
+              <div class="edit-panel" id="edit-${escapeHtml(s.id)}">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label" for="edit-title-${escapeHtml(s.id)}">Título</label>
+                    <input id="edit-title-${escapeHtml(s.id)}" class="form-input" type="text" value="${escapeHtml(s.title)}">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="edit-tag-${escapeHtml(s.id)}">Categoría</label>
+                    <select id="edit-tag-${escapeHtml(s.id)}" class="form-input">
+                      <option value="">— ninguna —</option>
+                      <option value="game" ${s.tag==='game'?'selected':''}>🎮 Juego</option>
+                      <option value="art" ${s.tag==='art'?'selected':''}>🎨 Arte</option>
+                      <option value="tool" ${s.tag==='tool'?'selected':''}>🛠️ Herramienta</option>
+                      <option value="demo" ${s.tag==='demo'?'selected':''}>📐 Demo</option>
+                      <option value="interactive" ${s.tag==='interactive'?'selected':''}>🖱️ Interactivo</option>
+                      <option value="other" ${s.tag==='other'?'selected':''}>📦 Otro</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group" style="margin-top:10px">
+                  <label class="form-label" for="edit-desc-${escapeHtml(s.id)}">Descripción</label>
+                  <textarea id="edit-desc-${escapeHtml(s.id)}" class="form-textarea" maxlength="500" rows="2">${escapeHtml(s.description || '')}</textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edit-author-${escapeHtml(s.id)}">Autor</label>
+                  <input id="edit-author-${escapeHtml(s.id)}" class="form-input" type="text" value="${escapeHtml(author)}">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edit-html-${escapeHtml(s.id)}">HTML</label>
+                  <textarea id="edit-html-${escapeHtml(s.id)}" class="form-textarea code-textarea" spellcheck="false">${escapeHtml(s.html_content || '')}</textarea>
+                </div>
+                <div class="row-actions">
+                  <button class="btn btn-outline" data-close="${escapeHtml(s.id)}">Cancelar</button>
+                  <button class="btn btn-primary" data-save="${escapeHtml(s.id)}">💾 Guardar</button>
+                </div>
+              </div>
+            </div>
+            <div class="meta">${escapeHtml(s.id)}</div>
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+              <button class="btn btn-outline" data-edit="${escapeHtml(s.id)}">✏️ Editar</button>
+              <button class="btn btn-outline" data-delete="${escapeHtml(s.id)}" style="border-color:rgba(239,68,68,.35);color:#f87171">🗑 Eliminar</button>
+            </div>
+          </div>
+        `;
+      }).join('') + `</div>`;
+
+      content.querySelectorAll('button[data-edit]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-edit');
+          const panel = document.getElementById(`edit-${id}`);
+          const isOpen = panel.style.display === 'block';
+          document.querySelectorAll('.edit-panel').forEach(p => p.style.display = 'none');
+          panel.style.display = isOpen ? 'none' : 'block';
+        });
+      });
+
+      content.querySelectorAll('button[data-close]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-close');
+          document.getElementById(`edit-${id}`).style.display = 'none';
+        });
+      });
+
+      content.querySelectorAll('button[data-save]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-save');
+          await saveSnippetEdits(id);
+        });
+      });
+
+      content.querySelectorAll('button[data-delete]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-delete');
+          await deleteSnippet(id);
+        });
+      });
+    }
+
+    async function saveSnippetEdits(id) {
+      const title = document.getElementById(`edit-title-${id}`).value.trim();
+      const description = document.getElementById(`edit-desc-${id}`).value.trim();
+      const author = document.getElementById(`edit-author-${id}`).value.trim();
+      const tag = document.getElementById(`edit-tag-${id}`).value || null;
+      const html_content = document.getElementById(`edit-html-${id}`).value;
+
+      if (!title) { showToast('El título no puede estar vacío.', 'error'); return; }
+
+      try {
+        const { error } = await supabaseClient
+          .from('snippets')
+          .update({ title, description, author, tag, html_content })
+          .eq('id', id);
+
+        if (error) throw error;
+        showToast('Cambios guardados.', 'success');
+        await loadAll();
+      } catch (err) {
+        showToast('Error al guardar: ' + err.message, 'error', 5000);
+      }
+    }
+
+    async function deleteSnippet(id) {
+      if (!confirm('¿Seguro que quieres eliminar esta creación? Esta acción no se puede deshacer.')) return;
+      try {
+        const { error } = await supabaseClient
+          .from('snippets')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+        showToast('Creación eliminada.', 'success');
+        await loadAll();
+      } catch (err) {
+        showToast('No se pudo eliminar: ' + err.message, 'error', 5000);
+      }
+    }
+
+    async function initPage() {
+      await requireAuth({ redirect: false });
+      await renderAuthNav();
+
+      const session = await getSession();
+      currentSession = session;
+      const modStatus = document.getElementById('modStatus');
+
+      if (!session || !isModerator(session)) {
+        modStatus.textContent = 'Sin permisos de moderador.';
+        document.getElementById('modContent').innerHTML = `<div class="empty-state"><h3>Acceso restringido</h3><p>Esta zona es solo para moderadores.</p></div>`;
+        return;
+      }
+
+      modStatus.textContent = 'Moderador activo';
+      document.getElementById('modContent').innerHTML = '<div class="empty-state"><div class="spinner"></div>Cargando…</div>';
+      await loadAll();
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', loadAll);
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>
