@@ -1,5 +1,0 @@
-[   86310ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8082/docs/css/style.css:0
-[   86443ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8082/docs/js/app.js:0
-[   86444ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8082/docs/js/config.js:0
-[   86457ms] ReferenceError: requireAuth is not defined
-    at HTMLDocument.initPage (http://localhost:8082/docs/about.html:126:7)
