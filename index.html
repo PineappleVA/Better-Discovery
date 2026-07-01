@@ -5,22 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Better Discovery</title>
   <meta name="description" content="Comparte y descubre creaciones HTML interactivas. Sube tu HTML y deja que otros lo vean, den like y comenten.">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/Better-Discovery/css/style.css">
 </head>
 <body>
   <nav>
-    <a href="index.html" class="nav-logo">🚀 Better Discovery</a>
+    <a href="/Better-Discovery/index.html" class="nav-logo">🚀 Better Discovery</a>
     <div class="nav-links">
-      <a href="index.html" class="active">Explorar</a>
-      <a href="docs/about.html">Acerca de</a>
-      <a href="upload.html" class="btn btn-primary">+ Subir</a>
+      <a href="/Better-Discovery/index.html" class="active">Explorar</a>
+      <a href="/Better-Discovery/docs/about.html">Acerca de</a>
+      <a href="/Better-Discovery/upload.html" class="btn btn-primary">+ Subir</a>
     </div>
     <div class="nav-auth" id="navAuth"></div>
   </nav>
   <section class="hero">
     <h1>Descubre creaciones HTML</h1>
     <p>Sube tus proyectos HTML y deja que cualquiera los vea, interactúe, reaccione y comente — sin programar.</p>
-    <a href="upload.html" class="btn btn-primary" id="heroUploadBtn" style="font-size:1rem;padding:13px 32px">Comparte tu HTML ✨</a>
+    <a href="/Better-Discovery/upload.html" class="btn btn-primary" id="heroUploadBtn" style="font-size:1rem;padding:13px 32px">Comparte tu HTML ✨</a>
   </section>
   <div class="container">
     <div class="search-wrap">
@@ -42,13 +42,13 @@
     <div id="pagination" class="pagination"></div>
   </div>
   <footer class="site-footer">
-    <a href="docs/terms.html">Términos y condiciones</a>
+    <a href="/Better-Discovery/docs/terms.html">Términos y condiciones</a>
     <span>·</span>
-    <a href="docs/privacy.html">Política de privacidad</a>
+    <a href="/Better-Discovery/docs/privacy.html">Política de privacidad</a>
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/app.js"></script>
+  <script src="/Better-Discovery/js/config.js"></script>
+  <script src="/Better-Discovery/js/app.js"></script>
   <script>
     const PER_PAGE = 12;
     let page = 0;
@@ -58,7 +58,7 @@
     function renderCard(s, idx) {
       const author = s.author || DEFAULT_AUTHOR_NAME;
       return `
-        <a href="view.html?id=${encodeURIComponent(s.id)}" class="snippet-card reveal" style="--i:${idx % 8}">
+        <a href="/Better-Discovery/view.html?id=${encodeURIComponent(s.id)}" class="snippet-card reveal" style="--i:${idx % 8}">
           <div class="card-thumb">🌐</div>
           <div class="card-body">
             <div class="card-title">${escapeHtml(s.title)}</div>
@@ -102,7 +102,7 @@
               <div style="font-size:3rem;margin-bottom:14px">🎨</div>
               <h3>${query ? 'No se encontraron resultados' : 'Aún no hay creaciones'}</h3>
               <p>${query ? 'Prueba con otra búsqueda.' : '¡Comparte algo y abre la galería!'}</p>
-              <a href="upload.html" class="btn btn-primary" style="margin-top:18px;display:inline-flex">+ Subir HTML</a>
+              <a href="/Better-Discovery/upload.html" class="btn btn-primary" style="margin-top:18px;display:inline-flex">+ Subir HTML</a>
             </div>`;
           document.getElementById('pagination').innerHTML = '';
           return;

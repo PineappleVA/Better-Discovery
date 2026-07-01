@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Acerca de – Better Discovery</title>
   <meta name="description" content="Conoce Better Discovery y cómo configurarlo con Supabase.">
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="/Better-Discovery/css/style.css">
 </head>
 <body>
   <nav>
-    <a href="../index.html" class="nav-logo">🚀 Better Discovery</a>
+    <a href="/Better-Discovery/index.html" class="nav-logo">🚀 Better Discovery</a>
     <div class="nav-links">
-      <a href="../index.html">Explorar</a>
-      <a href="about.html" class="active">Acerca de</a>
-      <a href="../upload.html" class="btn btn-primary">+ Subir</a>
+      <a href="/Better-Discovery/index.html">Explorar</a>
+      <a href="/Better-Discovery/docs/about.html" class="active">Acerca de</a>
+      <a href="/Better-Discovery/upload.html" class="btn btn-primary">+ Subir</a>
     </div>
     <div class="nav-auth" id="navAuth"></div>
   </nav>
@@ -67,7 +67,7 @@
 
     <h2>🔐 Acceso</h2>
     <p>
-      Usa la pantalla de <a href="../login.html" style="color:var(--accent)">Login</a> para entrar con tu cuenta
+      Usa la pantalla de <a href="/Better-Discovery/login.html" style="color:var(--accent)">Login</a> para entrar con tu cuenta
       y luego explora, sube, comenta y administra tu perfil.
     </p>
 
@@ -100,15 +100,15 @@
     </div>
 
     <footer class="site-footer">
-      <a href="terms.html">Términos y condiciones</a>
+      <a href="/Better-Discovery/docs/terms.html">Términos y condiciones</a>
       <span>·</span>
-      <a href="privacy.html">Política de privacidad</a>
+      <a href="/Better-Discovery/docs/privacy.html">Política de privacidad</a>
     </footer>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="../js/config.js"></script>
-  <script src="../js/app.js"></script>
+  <script src="/Better-Discovery/js/config.js"></script>
+  <script src="/Better-Discovery/js/app.js"></script>
   <script>
     async function initPage() {
       await requireAuth({ redirect: false });

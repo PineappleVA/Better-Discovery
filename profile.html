@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Perfil – Better Discovery</title>
   <meta name="description" content="Edita tu perfil, revisa tus creaciones y administra a quién sigues.">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/Better-Discovery/css/style.css">
   <style>
     .profile-page { max-width: 1120px; margin: 0 auto; padding: 34px 24px 80px; animation: fadeUp .4s ease both; }
     .profile-hero { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; background: linear-gradient(135deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border: 1px solid var(--border); border-radius: 20px; padding: 26px; margin-bottom: 22px; box-shadow: var(--shadow); }
@@ -38,11 +38,11 @@
 </head>
 <body>
   <nav>
-    <a href="index.html" class="nav-logo">🚀 Better Discovery</a>
+    <a href="/Better-Discovery/index.html" class="nav-logo">🚀 Better Discovery</a>
     <div class="nav-links">
-      <a href="index.html">Explorar</a>
-      <a href="docs/about.html">Acerca de</a>
-      <a href="profile.html" class="btn btn-primary">Perfil</a>
+      <a href="/Better-Discovery/index.html">Explorar</a>
+      <a href="/Better-Discovery/docs/about.html">Acerca de</a>
+      <a href="/Better-Discovery/profile.html" class="btn btn-primary">Perfil</a>
     </div>
     <div class="nav-auth" id="navAuth"></div>
   </nav>
@@ -74,7 +74,7 @@
         </div>
         <div class="profile-actions">
           <button class="btn btn-primary" id="saveProfileBtn" type="button">Guardar cambios</button>
-          <a href="upload.html" class="btn btn-outline">Subir creación</a>
+          <a href="/Better-Discovery/upload.html" class="btn btn-outline">Subir creación</a>
         </div>
       </div>
       <div class="profile-card">
@@ -104,13 +104,13 @@
     </section>
   </main>
   <footer class="site-footer">
-    <a href="docs/terms.html">Términos y condiciones</a>
+    <a href="/Better-Discovery/docs/terms.html">Términos y condiciones</a>
     <span>·</span>
-    <a href="docs/privacy.html">Política de privacidad</a>
+    <a href="/Better-Discovery/docs/privacy.html">Política de privacidad</a>
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/app.js"></script>
+  <script src="/Better-Discovery/js/config.js"></script>
+  <script src="/Better-Discovery/js/app.js"></script>
   <script>
     const MAX_BYTES = 1 * 1024 * 1024;
     function renderProfileHeader() {
@@ -160,12 +160,12 @@
             <div style="font-size:2.5rem;margin-bottom:12px">🖼️</div>
             <h3>Aún no hay creaciones</h3>
             <p>Sube tu primer HTML para que aparezca aquí.</p>
-            <a href="upload.html" class="btn btn-primary" style="margin-top:16px;display:inline-flex">+ Subir HTML</a>
+            <a href="/Better-Discovery/upload.html" class="btn btn-primary" style="margin-top:16px;display:inline-flex">+ Subir HTML</a>
           </div>`;
         return;
       }
       list.innerHTML = snippets.map(snippet => `
-        <a href="view.html?id=${encodeURIComponent(snippet.id)}" class="creation-card">
+        <a href="/Better-Discovery/view.html?id=${encodeURIComponent(snippet.id)}" class="creation-card">
           <div class="thumb">🌐</div>
           <div class="body">
             <h3>${escapeHtml(snippet.title)}</h3>
