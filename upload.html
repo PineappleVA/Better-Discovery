@@ -258,9 +258,10 @@
       btn.textContent = '⏳ Publicando…';
       status.textContent = '';
       try {
-        const { data, error } = await supabaseClient
-          .from('snippets')
-          .insert([{ title, description: desc, author, tag: tag || null, html_content: htmlCode }])
+      const id = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const { data, error } = await supabaseClient
+        .from('snippets')
+        .insert([{ id, title, description: desc, author, tag: tag || null, html_content: htmlCode }])
           .select('id')
           .single();
         if (error) throw error;

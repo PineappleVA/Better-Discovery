@@ -348,9 +348,10 @@
       btn.disabled = true;
       btn.textContent = '⏳ Publicando…';
       try {
-        const { error } = await supabaseClient
-          .from('comments')
-          .insert([{ snippet_id: snippetId, author, content }]);
+      const id = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const { error } = await supabaseClient
+        .from('comments')
+        .insert([{ id, snippet_id: snippetId, author, content }]);
         if (error) throw error;
         document.getElementById('commentText').value = '';
         showToast('¡Comentario publicado!', 'success');
