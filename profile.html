@@ -38,11 +38,11 @@
 </head>
 <body>
   <nav>
-    <a href="/index.html" class="nav-logo">🚀 Better Discovery</a>
+    <a href="index.html" class="nav-logo">🚀 Better Discovery</a>
     <div class="nav-links">
-      <a href="/index.html">Explorar</a>
-      <a href="/docs/about.html">Acerca de</a>
-      <a href="/profile.html" class="btn btn-primary">Perfil</a>
+      <a href="index.html">Explorar</a>
+      <a href="docs/about.html">Acerca de</a>
+      <a href="profile.html" class="btn btn-primary">Perfil</a>
     </div>
     <div class="nav-auth" id="navAuth"></div>
   </nav>
@@ -74,7 +74,7 @@
         </div>
         <div class="profile-actions">
           <button class="btn btn-primary" id="saveProfileBtn" type="button">Guardar cambios</button>
-          <a href="/upload.html" class="btn btn-outline">Subir creación</a>
+          <a href="upload.html" class="btn btn-outline">Subir creación</a>
         </div>
       </div>
       <div class="profile-card">
@@ -104,9 +104,9 @@
     </section>
   </main>
   <footer class="site-footer">
-    <a href="/docs/terms.html">Términos y condiciones</a>
+    <a href="docs/terms.html">Términos y condiciones</a>
     <span>·</span>
-    <a href="/docs/privacy.html">Política de privacidad</a>
+    <a href="docs/privacy.html">Política de privacidad</a>
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
@@ -160,12 +160,12 @@
             <div style="font-size:2.5rem;margin-bottom:12px">🖼️</div>
             <h3>Aún no hay creaciones</h3>
             <p>Sube tu primer HTML para que aparezca aquí.</p>
-            <a href="/upload.html" class="btn btn-primary" style="margin-top:16px;display:inline-flex">+ Subir HTML</a>
+            <a href="upload.html" class="btn btn-primary" style="margin-top:16px;display:inline-flex">+ Subir HTML</a>
           </div>`;
         return;
       }
       list.innerHTML = snippets.map(snippet => `
-        <a href="/view.html?id=${encodeURIComponent(snippet.id)}" class="creation-card">
+        <a href="view.html?id=${encodeURIComponent(snippet.id)}" class="creation-card">
           <div class="thumb">🌐</div>
           <div class="body">
             <h3>${escapeHtml(snippet.title)}</h3>

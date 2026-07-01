@@ -1,0 +1,47 @@
+- generic [active] [ref=f7e1]:
+  - navigation [ref=f7e2]:
+    - link "🚀 Better Discovery" [ref=f7e3] [cursor=pointer]:
+      - /url: ../index.html
+    - generic [ref=f7e4]:
+      - link "Explorar" [ref=f7e5] [cursor=pointer]:
+        - /url: ../index.html
+      - link "Acerca de" [ref=f7e6] [cursor=pointer]:
+        - /url: about.html
+      - link "Términos" [ref=f7e7] [cursor=pointer]:
+        - /url: terms.html
+    - link "Login" [ref=f7e9] [cursor=pointer]:
+      - /url: /login.html
+  - main [ref=f7e10]:
+    - heading "Términos y condiciones" [level=1] [ref=f7e11]
+    - paragraph [ref=f7e12]: "Última actualización: 19 de junio de 2026."
+    - paragraph [ref=f7e13]: Estos términos regulan el uso de Better Discovery, una galería comunitaria. Al usar la plataforma aceptas estas condiciones y confirmas que entiendes cómo funciona el servicio.
+    - generic [ref=f7e14]:
+      - heading "1. Qué ofrece el servicio" [level=2] [ref=f7e15]
+      - paragraph [ref=f7e16]: Better Discovery permite publicar, descubrir y comentar creaciones HTML. El sitio está diseñado para funcionar como una experiencia estática, con autenticación y persistencia apoyadas en servicios externos.
+      - heading "2. Cuenta y responsabilidad" [level=2] [ref=f7e17]
+      - paragraph [ref=f7e18]: Eres responsable de la información que compartes, del contenido que publicas y de cualquier actividad realizada desde tu cuenta. Si detectas un uso no autorizado, debes cambiar tus credenciales y revisar tu sesión.
+      - heading "3. Contenido permitido" [level=2] [ref=f7e19]
+      - list [ref=f7e20]:
+        - listitem [ref=f7e21]: Creaciones HTML completas que puedan renderizarse en un navegador.
+        - listitem [ref=f7e22]: CSS y JavaScript embebidos dentro del propio documento HTML.
+        - listitem [ref=f7e23]: Contenido original o contenido sobre el que tengas derechos suficientes para publicar.
+      - heading "4. Contenido prohibido" [level=2] [ref=f7e24]
+      - list [ref=f7e25]:
+        - listitem [ref=f7e26]: Archivos ZIP, paquetes comprimidos u otros formatos no HTML.
+        - listitem [ref=f7e27]: Copias, clones o remixes no autorizados de creaciones ajenas.
+        - listitem [ref=f7e28]: Contenido ilegal, fraudulento, difamatorio, malicioso o que abuse de terceros.
+        - listitem [ref=f7e29]: Código destinado a robar credenciales, explotar la plataforma o dañar el navegador de otras personas.
+      - heading "5. Moderación" [level=2] [ref=f7e30]
+      - paragraph [ref=f7e31]: Podemos ocultar, rechazar o eliminar contenido que incumpla estas reglas. También podemos limitar funciones si se detecta abuso, spam, automatización indebida o comportamiento que degrade la experiencia del resto.
+      - heading "6. Propiedad intelectual" [level=2] [ref=f7e32]
+      - paragraph [ref=f7e33]: Conservas la propiedad de tus creaciones, pero nos concedes una licencia no exclusiva para mostrarlas, almacenarlas y reproducirlas dentro de Better Discovery con el único fin de operar el servicio.
+      - heading "7. Limitación de responsabilidad" [level=2] [ref=f7e34]
+      - paragraph [ref=f7e35]: El servicio se ofrece “tal cual”. No garantizamos disponibilidad continua, ausencia de errores ni que el contenido publicado por otras personas sea exacto, seguro o adecuado para todos los públicos.
+      - heading "8. Cambios" [level=2] [ref=f7e36]
+      - paragraph [ref=f7e37]: Podemos actualizar estas condiciones cuando sea necesario. Si el cambio es material, intentaremos reflejarlo en la interfaz o en la documentación del proyecto.
+  - contentinfo [ref=f7e38]:
+    - link "Política de privacidad" [ref=f7e39] [cursor=pointer]:
+      - /url: privacy.html
+    - generic [ref=f7e40]: ·
+    - link "Acerca de" [ref=f7e41] [cursor=pointer]:
+      - /url: about.html

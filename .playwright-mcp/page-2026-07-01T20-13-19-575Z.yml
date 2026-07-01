@@ -1,0 +1,34 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "🚀 Better Discovery" [ref=e3] [cursor=pointer]:
+      - /url: index.html
+    - generic [ref=e4]:
+      - link "Explorar" [ref=e5] [cursor=pointer]:
+        - /url: index.html
+      - link "Acerca de" [ref=e6] [cursor=pointer]:
+        - /url: docs/about.html
+      - link "+ Subir" [ref=e7] [cursor=pointer]:
+        - /url: upload.html
+    - link "Login" [ref=e9] [cursor=pointer]:
+      - /url: /login.html
+  - generic [ref=e10]:
+    - heading "Descubre creaciones HTML" [level=1] [ref=e11]
+    - paragraph [ref=e12]: Sube tus proyectos HTML y deja que cualquiera los vea, interactúe, reaccione y comente — sin programar.
+    - link "Comparte tu HTML ✨" [ref=e13] [cursor=pointer]:
+      - /url: upload.html
+  - generic [ref=e14]:
+    - generic [ref=e15]:
+      - img
+      - searchbox "Busca por título o descripción…" [ref=e16]
+    - generic [ref=e17]:
+      - heading "✨ Últimas creaciones" [level=2] [ref=e18]
+      - combobox "Ordenar por" [ref=e19] [cursor=pointer]:
+        - option "Más recientes" [selected]
+        - option "Más valoradas"
+    - generic [ref=e21]: Cargando…
+  - contentinfo [ref=e23]:
+    - link "Términos y condiciones" [ref=e24] [cursor=pointer]:
+      - /url: docs/terms.html
+    - generic [ref=e25]: ·
+    - link "Política de privacidad" [ref=e26] [cursor=pointer]:
+      - /url: docs/privacy.html

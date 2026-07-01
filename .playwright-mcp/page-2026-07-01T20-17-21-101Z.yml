@@ -1,0 +1,94 @@
+- generic [active] [ref=f6e1]:
+  - navigation [ref=f6e2]:
+    - link "🚀 Better Discovery" [ref=f6e3] [cursor=pointer]:
+      - /url: ../index.html
+    - generic [ref=f6e4]:
+      - link "Explorar" [ref=f6e5] [cursor=pointer]:
+        - /url: ../index.html
+      - link "Acerca de" [ref=f6e6] [cursor=pointer]:
+        - /url: about.html
+      - link "+ Subir" [ref=f6e7] [cursor=pointer]:
+        - /url: ../upload.html
+    - link "Login" [ref=f6e9] [cursor=pointer]:
+      - /url: /login.html
+  - generic [ref=f6e10]:
+    - heading "Acerca de Better Discovery" [level=1] [ref=f6e11]
+    - paragraph [ref=f6e12]:
+      - text: Better Discovery es una galería abierta y comunitaria para creaciones HTML. Sube tus páginas HTML, demos interactivas, juegos o herramientas y deja que cualquier persona las vea, juegue, reaccione y comente —
+      - strong [ref=f6e13]: sin necesidad de programar
+      - text: .
+    - heading "✨ Funciones" [level=2] [ref=f6e14]
+    - generic [ref=f6e15]:
+      - generic [ref=f6e16]:
+        - generic [ref=f6e17]: 📤
+        - heading "Subir HTML" [level=3] [ref=f6e18]
+        - paragraph [ref=f6e19]: Pega hasta 1 MB de código HTML y publícalo al instante.
+      - generic [ref=f6e20]:
+        - generic [ref=f6e21]: 🖥️
+        - heading "Vista previa en vivo" [level=3] [ref=f6e22]
+        - paragraph [ref=f6e23]: Cada creación corre en un iframe con sandbox aislado.
+      - generic [ref=f6e24]:
+        - generic [ref=f6e25]: ❤️
+        - heading "Me gusta" [level=3] [ref=f6e26]
+        - paragraph [ref=f6e27]: Muestra apoyo a tus creaciones favoritas con un solo clic.
+      - generic [ref=f6e28]:
+        - generic [ref=f6e29]: 💬
+        - heading "Comentarios" [level=3] [ref=f6e30]
+        - paragraph [ref=f6e31]: Deja feedback, preguntas o apoyo a las personas creadoras.
+      - generic [ref=f6e32]:
+        - generic [ref=f6e33]: 👤
+        - heading "Perfil y creaciones" [level=3] [ref=f6e34]
+        - paragraph [ref=f6e35]: Edita tu perfil, sigue a otras personas y revisa tu espacio usado.
+      - generic [ref=f6e36]:
+        - generic [ref=f6e37]: 🔍
+        - heading "Búsqueda" [level=3] [ref=f6e38]
+        - paragraph [ref=f6e39]: Encuentra creaciones por título o descripción con búsqueda instantánea.
+      - generic [ref=f6e40]:
+        - generic [ref=f6e41]: 📱
+        - heading "Responsive" [level=3] [ref=f6e42]
+        - paragraph [ref=f6e43]: Funciona en escritorio, tablet y dispositivos móviles.
+    - heading "🔐 Acceso" [level=2] [ref=f6e44]
+    - paragraph [ref=f6e45]:
+      - text: Usa la pantalla de
+      - link "Login" [ref=f6e46] [cursor=pointer]:
+        - /url: ../login.html
+      - text: para entrar con tu cuenta y luego explora, sube, comenta y administra tu perfil.
+    - heading "📄 Páginas" [level=2] [ref=f6e47]
+    - paragraph [ref=f6e48]: "El proyecto contiene varias páginas:"
+    - list [ref=f6e49]:
+      - listitem [ref=f6e50]:
+        - strong [ref=f6e51]: index.html
+        - text: — Explora y descubre todas las creaciones HTML
+      - listitem [ref=f6e52]:
+        - strong [ref=f6e53]: upload.html
+        - text: — Sube una nueva creación HTML (hasta 1 MB)
+      - listitem [ref=f6e54]:
+        - strong [ref=f6e55]: view.html?id=…
+        - text: — Visualiza, da like y comenta una creación
+      - listitem [ref=f6e56]:
+        - strong [ref=f6e57]: profile.html
+        - text: — Edita tu perfil, ve tus creaciones y seguidores
+      - listitem [ref=f6e58]:
+        - strong [ref=f6e59]: about.html
+        - text: "— Esta página: resumen del proyecto"
+      - listitem [ref=f6e60]:
+        - strong [ref=f6e61]: terms.html
+        - text: — Términos y condiciones
+      - listitem [ref=f6e62]:
+        - strong [ref=f6e63]: privacy.html
+        - text: — Política de privacidad
+    - heading "🛠️ Tech Stack" [level=2] [ref=f6e64]
+    - paragraph [ref=f6e65]:
+      - text: HTML + CSS + JavaScript puro (sin build tools ni frameworks) y
+      - link "Supabase" [ref=f6e66] [cursor=pointer]:
+        - /url: https://supabase.com
+      - text: para autenticación y persistencia.
+    - heading "🔒 Seguridad" [level=2] [ref=f6e67]
+    - paragraph [ref=f6e68]: Todo el HTML subido se ejecuta dentro de un iframe con un sandbox restringido.
+    - generic [ref=f6e69]: Hecho con ❤️
+    - contentinfo [ref=f6e70]:
+      - link "Términos y condiciones" [ref=f6e71] [cursor=pointer]:
+        - /url: terms.html
+      - generic [ref=f6e72]: ·
+      - link "Política de privacidad" [ref=f6e73] [cursor=pointer]:
+        - /url: privacy.html
