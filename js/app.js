@@ -5,8 +5,8 @@
 /* ── Supabase client ── */
 let supabaseClient = null;
 const DEFAULT_AUTHOR_NAME = 'Anónimo';
-const LOGIN_PAGE = '/login.html';
-const PROFILE_PAGE = '/profile.html';
+const LOGIN_PAGE = '/Better-Discovery/login.html';
+const PROFILE_PAGE = '/Better-Discovery/profile.html';
 const PROFILE_STORAGE_KEY = 'bd_profile';
 const FOLLOW_STORAGE_KEY = 'bd_followed_authors';
 const OWNED_SNIPPETS_STORAGE_KEY = 'bd_owned_snippets';
@@ -82,7 +82,7 @@ async function renderAuthNav() {
     ? ''
     : `<a href="${PROFILE_PAGE}" class="btn btn-outline">Perfil</a>`;
   const modLink = isModerator(session)
-    ? `<a href="/mod.html" class="btn btn-outline">Mod</a>`
+    ? `<a href="/Better-Discovery/mod.html" class="btn btn-outline">Mod</a>`
     : '';
   navAuth.innerHTML = `
     <span class="user-label">
@@ -115,7 +115,7 @@ async function deleteSnippet(id) {
     if (error) throw error;
 
     showToast('Creación eliminada.', 'success');
-    setTimeout(() => { window.location.href = 'index.html'; }, 800);
+    setTimeout(() => { window.location.href = '/Better-Discovery/index.html'; }, 800);
   } catch (err) {
     showToast('No se pudo eliminar: ' + err.message, 'error', 5000);
     if (btn) { btn.disabled = false; btn.textContent = '🗑 Eliminar'; }
@@ -353,7 +353,6 @@ function configNoticeHtml() {
 /* ── Globals used by mod.html ── */
 if (typeof window !== 'undefined') {
   window.mod = {
-    loadAll,
     saveSnippetEdits,
     deleteSnippet,
     requireAuth,
