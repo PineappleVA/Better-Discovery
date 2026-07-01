@@ -411,7 +411,7 @@ function getDiscoveryPlusBadgeHtml(session) {
   return `<span class="discovery-badge" title="Discovery+">Discovery+ ${escapeHtml(display)}</span>`;
 }
 
-function getMaxUploadBytes() {
+function getMaxUploadBytes(session) {
   return isDiscoveryPlus() ? MAX_PRO_BYTES : MAX_FREE_BYTES;
 }
 
