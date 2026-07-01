@@ -157,6 +157,7 @@
             <span class="author-pill">
               <span class="profile-dot large" id="snippetAuthorInitial">A</span>
               <span id="snippetAuthor">—</span>
+              <span id="snippetAuthorPlus" style="display:none"><span class="discovery-badge">Discovery+</span></span>
             </span>
             <span>📅 <span id="snippetDate">—</span></span>
             <span id="snippetTagWrap" style="display:none">🏷️ <span class="tag-badge" id="snippetTag"></span></span>
@@ -294,6 +295,8 @@
       document.getElementById('likeCount').textContent = s.likes ?? 0;
       if (liked) document.getElementById('likeBtn').classList.add('liked');
       renderFollowButton(author);
+      const plusEl = document.getElementById('snippetAuthorPlus');
+      if (plusEl) plusEl.style.display = isDiscoveryPlus() && (s.author_plus_active || s.author_plus || false) ? 'inline-flex' : 'none';
       document.getElementById('previewFrame').srcdoc = s.html_content;
       document.getElementById('loadingScreen').style.display = 'none';
       document.getElementById('mainContent').style.display = '';

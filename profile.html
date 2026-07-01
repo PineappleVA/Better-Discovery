@@ -52,7 +52,8 @@
       <div>
         <div class="profile-title">
           <h1 id="profileName">Tu perfil</h1>
-          <span class="tag-badge">1 MB total</span>
+          <span class="tag-badge limit-badge" id="limitBadge">1 MB / usuario</span>
+          <span class="discovery-badge" id="plusBadge" style="display:none">Discovery+</span>
         </div>
         <p class="profile-bio" id="profileBio">Edita tu nombre público y tu biografía para personalizar tu espacio.</p>
         <div class="profile-note" id="profileIdentity"></div>
@@ -144,13 +145,21 @@
       });
     }
     function updateUsage(snippets) {
+      const maxBytes = getMaxUploadBytes ? getMaxUploadBytes() : MAX_BYTES;
       const used = snippets.reduce((sum, snippet) => sum + snippetBytes(snippet), 0);
-      const pct = used >= MAX_BYTES ? 100 : (used / MAX_BYTES) * 100;
-      document.getElementById('usageText').textContent = `${bytesToSize(used)} / 1 MB`;
+      const pct = used >= maxBytes ? 100 : (used / maxBytes) * 100;
+      document.getElementById('usageText').textContent = `${bytesToSize(used)} / ${bytesToSize(maxBytes)}`;
       document.getElementById('usagePercent').textContent = `${pct.toFixed(1)}%`;
       document.getElementById('usageBar').style.width = `${pct}%`;
       document.getElementById('usageCount').textContent = `${snippets.length} creaciones guardadas`;
-      document.getElementById('usageRemaining').textContent = `${bytesToSize(Math.max(MAX_BYTES - used, 0))} disponible`;
+      document.getElementById('usageRemaining').textContent = `${bytesToSize(Math.max(maxBytes - used, 0))} disponible`;
+      const limitBadge = document.getElementById('limitBadge');
+      const plusBadge = document.getElementById('plusBadge');
+      const plusActive = isDiscoveryPlus ? isDiscoveryPlus() : false;
+      if (plusActive) {
+        if (limitBadge) limitBadge.textContent = `${bytesToSize(maxBytes)} / usuario`;
+        if (plusBadge) plusBadge.style.display = 'inline-flex';
+      }
     }
     function renderCreations(snippets) {
       const list = document.getElementById('creationsList');

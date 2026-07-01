@@ -372,3 +372,51 @@ if (typeof window !== 'undefined') {
     DEFAULT_AUTHOR_NAME,
   };
 }
+
+/* ── Discovery+ helpers ── */
+const DISCOVERY_PLUS_KEY = 'bd_discovery_plus';
+const MAX_FREE_BYTES = 1 * 1024 * 1024;
+const MAX_PRO_BYTES = 5 * 1024 * 1024;
+
+function getDiscoveryPlusStatus() {
+  try {
+    const raw = localStorage.getItem(DISCOVERY_PLUS_KEY);
+    if (!raw) return { active: false, expiresAt: null };
+    const data = JSON.parse(raw);
+    if (data && data.expiresAt && Date.now() > Number(data.expiresAt)) {
+      localStorage.removeItem(DISCOVERY_PLUS_KEY);
+      return { active: false, expiresAt: null };
+    }
+    return { active: !!data?.active, expiresAt: data?.expiresAt || null };
+  } catch {
+    return { active: false, expiresAt: null };
+  }
+}
+
+function setDiscoveryPlusStatus(next) {
+  try {
+    localStorage.setItem(DISCOVERY_PLUS_KEY, JSON.stringify(next));
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+function isDiscoveryPlus() {
+  return getDiscoveryPlusStatus().active;
+}
+
+function getDiscoveryPlusBadgeHtml(session) {
+  if (!isDiscoveryPlus()) return '';
+  const display = session?.user?.user_metadata?.display_name || session?.user?.email?.split('@')[0] || '';
+  return `<span class="discovery-badge" title="Discovery+">Discovery+ ${escapeHtml(display)}</span>`;
+}
+
+function getMaxUploadBytes() {
+  return isDiscoveryPlus() ? MAX_PRO_BYTES : MAX_FREE_BYTES;
+}
+
+function getProfileDisplayNameWithPlus(base) {
+  if (!base || base === DEFAULT_AUTHOR_NAME) return base;
+  const clean = String(base).replace(/\s*Discovery\+\s*/i, '').trim();
+  return isDiscoveryPlus() ? `${clean} Discovery+` : clean;
+}

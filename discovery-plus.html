@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discovery+ – Better Discovery</title>
+  <link rel="stylesheet" href="/Better-Discovery/css/style.css">
+  <style>
+    .plus-page { max-width: 1100px; margin: 0 auto; padding: 38px 24px 90px; animation: fadeUp .45s ease both; }
+    .plus-hero { display:grid; grid-template-columns: 1fr; gap:18px; align-items:center; margin-bottom:26px; }
+    .plus-hero .hero-badge { display:inline-flex; align-items:center; gap:8px; background: linear-gradient(135deg,#ff7a00,#ff4500); color:#fff; padding:6px 12px; border-radius:999px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-size:.78rem; }
+    .plus-hero h1 { font-size: clamp(2rem,4vw,3rem); letter-spacing:-.03em; line-height:1.05; }
+    .plus-hero h1 span { background: linear-gradient(90deg,#ff7a00,#ff4500,#ffb347); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .plus-sub { color: var(--text-muted); font-size: 1rem; line-height: 1.6; max-width: 720px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 22px; }
+    .card { background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
+    .card h3 { display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:1.05rem; }
+    .card p { color: var(--text-muted); line-height: 1.55; font-size:.92rem; }
+    .cta-row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .cta-row .pill { padding: 10px 14px; border-radius: 12px; border:1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); min-width: 240px; }
+    .cta-row .pill small { display:block; color: var(--text-muted); }
+    .discovery-badge { display:inline-flex; align-items:center; gap:6px; background: linear-gradient(90deg,#ff7a00,#ff4500); color:#fff; padding:3px 10px; border-radius:999px; font-size:.78rem; font-weight:700; box-shadow: 0 10px 24px rgba(255,69,0,.25); }
+    .status-row { display:flex; gap:12px; flex-wrap:wrap; margin-top: 14px; }
+    .status-chip { padding: 8px 12px; border-radius: 10px; border:1px solid var(--border); background: rgba(23,23,28,.85); color: var(--text-primary); font-size:.88rem; }
+    .status-chip .label { color: var(--text-muted); font-size:.76rem; }
+    .status-chip .value { font-weight: 700; color: var(--text-primary); }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/Better-Discovery/index.html" class="nav-logo">🚀 Better Discovery</a>
+    <div class="nav-links">
+      <a href="/Better-Discovery/index.html">Explorar</a>
+      <a href="/Better-Discovery/about.html">Acerca de</a>
+      <a href="/Better-Discovery/discovery-plus.html" class="btn btn-primary">Discovery+</a>
+    </div>
+    <div class="nav-auth" id="navAuth"></div>
+  </nav>
+
+  <main class="plus-page">
+    <section class="plus-hero">
+      <div>
+        <div class="hero-badge">Discovery+</div>
+        <h1>Desbloquea más espacio,<br><span>mejor visibilidad y beneficios exclusivos</span></h1>
+        <p class="plus-sub">Sube creaciones más grandes, muestra tu estado de creador y mantente al día con beneficios pensados para quienes comparten contenido en Better Discovery.</p>
+      </div>
+    </section>
+
+    <div class="grid">
+      <div class="card">
+        <h3>💾 5 MB de almacenamiento</h3>
+        <p>Pasas de 1 MB a 5 MB. Sube experimentos más complejos, assets integrados y proyectos con más detalle sin recortar código.</p>
+      </div>
+      <div class="card">
+        <h3>🛡️ Badge en tu perfil</h3>
+        <p>Muestra que apoyas la plataforma con un badge exclusivo en tu perfil y en tus creaciones publicadas.</p>
+      </div>
+      <div class="card">
+        <h3>⏱️ Ping 24h</h3>
+        <p>Accede a actualizaciones y recordatorios diarios. Mantén tu perfil activo y revisa métricas relevantes sin esfuerzo.</p>
+      </div>
+    </div>
+
+    <div class="card" id="subscriptionCard">
+      <h3>Tu suscripción</h3>
+      <div class="status-row" id="subStatus">
+        <div class="status-chip"><span class="label">Estado</span><div class="value" id="plusStatus">No activa</div></div>
+        <div class="status-chip"><span class="label">Límite</span><div class="value" id="plusLimit">1 MB</div></div>
+      </div>
+      <div class="cta-row" style="margin-top:16px">
+        <button class="btn btn-primary" id="plusToggle">Activar Discovery+</button>
+        <span style="color:var(--text-muted);font-size:.85rem">Simulación local para pruebas.</span>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <a href="/Better-Discovery/terms.html">Términos y condiciones</a>
+    <span>·</span>
+    <a href="/Better-Discovery/privacy.html">Política de privacidad</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/Better-Discovery/js/config.js"></script>
+  <script src="/Better-Discovery/js/app.js"></script>
+  <script>
+    const PLUS_STORAGE_KEY = 'bd_discovery_plus';
+    const PRO_STORAGE_KEY = 'bd_subscribe_profile';
+    const MAX_FREE = 1 * 1024 * 1024;
+    const MAX_PRO = 5 * 1024 * 1024;
+
+    function getDiscoveryPlusStatus() {
+      try {
+        const raw = localStorage.getItem(PLUS_STORAGE_KEY);
+        if (!raw) return { active: false, expiresAt: null };
+        const data = JSON.parse(raw);
+        if (data && data.expiresAt && Date.now() > Number(data.expiresAt)) {
+          localStorage.removeItem(PLUS_STORAGE_KEY);
+          return { active: false, expiresAt: null };
+        }
+        return { active: !!data?.active, expiresAt: data?.expiresAt || null };
+      } catch {
+        return { active: false, expiresAt: null };
+      }
+    }
+
+    function setDiscoveryPlusStatus(next) {
+      localStorage.setItem(PLUS_STORAGE_KEY, JSON.stringify(next));
+    }
+
+    function isDiscoveryPlus(session) {
+      return getDiscoveryPlusStatus().active;
+    }
+
+    function getDiscoveryPlusBadgeHtml(session) {
+      if (!isDiscoveryPlus(session)) return '';
+      return `<span class="discovery-badge">Discovery+</span>`;
+    }
+
+    function applyProfileNameWithPlus(profileName) {
+      const profile = getProfileData();
+      if (!profileName || profileName === DEFAULT_AUTHOR_NAME) return profile.displayName || DEFAULT_AUTHOR_NAME;
+      const base = profileName.replace(/\s*Discovery\+\s*/i, '').trim();
+      return isDiscoveryPlus() ? (`${base} Discovery+`) : base;
+    }
+
+    function renderPlusStatus() {
+      const status = getDiscoveryPlusStatus();
+      const statusEl = document.getElementById('plusStatus');
+      const limitEl = document.getElementById('plusLimit');
+      const toggleBtn = document.getElementById('plusToggle');
+      if (!statusEl || !limitEl || !toggleBtn) return;
+      statusEl.textContent = status.active ? 'Activa' : 'No activa';
+      limitEl.textContent = status.active ? '5 MB' : '1 MB';
+      toggleBtn.textContent = status.active ? 'Cancelar Discovery+' : 'Activar Discovery+';
+    }
+
+    document.getElementById('plusToggle')?.addEventListener('click', () => {
+      const current = getDiscoveryPlusStatus();
+      if (current.active) {
+        setDiscoveryPlusStatus({ active: false, expiresAt: null });
+        showToast('Suscripción cancelada.', 'info');
+      } else {
+        const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
+        setDiscoveryPlusStatus({ active: true, expiresAt });
+        showToast('Discovery+ activada.', 'success');
+      }
+      renderPlusStatus();
+    });
+
+    document.getElementById('navAuth')?.addEventListener('click', e => {
+      const badge = e.target.closest('.plus-badge-cta');
+      if (badge) {
+        e.preventDefault();
+        window.location.href = '/Better-Discovery/discovery-plus.html';
+      }
+    });
+
+    async function initPage() {
+      await requireAuth({ redirect: false });
+      await renderAuthNav();
+      renderPlusStatus();
+    }
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>
