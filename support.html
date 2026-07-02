@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soporte – Better Discovery</title>
+  <link rel="stylesheet" href="/Better-Discovery/css/style.css">
+  <style>
+    .support-page { max-width: 960px; margin: 0 auto; padding: 34px 24px 90px; animation: fadeUp .45s ease both; }
+    .support-hero { display:grid; grid-template-columns: 1fr; gap:18px; align-items:center; margin-bottom:22px; }
+    .support-hero h1 { font-size: clamp(1.7rem, 3vw, 2.4rem); letter-spacing: -.02em; }
+    .support-hero p { color: var(--text-muted); line-height: 1.6; }
+    .ticket-card { background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius:18px; padding:18px; margin-bottom:14px; transition: border-color .2s; }
+    .ticket-card:hover { border-color: var(--accent); }
+    .ticket-card .ticket-header { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+    .ticket-title { font-weight:600; font-size:1rem; }
+    .ticket-meta { color: var(--text-muted); font-size:.82rem; margin-top:6px; }
+    .ticket-status { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:.72rem; font-weight:700; }
+    .ticket-status.open { background: rgba(99,102,241,.15); color:#c7d2fe; border:1px solid rgba(99,102,241,.3); }
+    .ticket-status.closed { background: rgba(239,68,68,.12); color:#f87171; border:1px solid rgba(239,68,68,.3); }
+    .chat-bubble { display:flex; flex-direction:column; gap:4px; margin-bottom:10px; }
+    .chat-bubble .who { font-weight:600; font-size:.85rem; color:#fff; }
+    .chat-bubble .what { color:#e5e7eb; font-size:.82rem; background:#0b0b0f; border:1px solid var(--border); border-radius:10px; padding:10px; }
+    .chat-bubble .when { font-size:.72rem; color: var(--text-muted); }
+    .form-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/Better-Discovery/index.html" class="nav-logo">🚀 Better Discovery</a>
+    <div class="nav-links">
+      <a href="/Better-Discovery/index.html">Explorar</a>
+      <a href="/Better-Discovery/about.html">Acerca de</a>
+      <a href="/Better-Discovery/discovery-plus.html" class="btn btn-primary">Discovery+</a>
+    </div>
+    <div class="nav-auth" id="navAuth"></div>
+  </nav>
+
+  <main class="support-page">
+    <div class="support-hero">
+      <div>
+        <h1>Soporte</h1>
+        <p>Envía un ticket y un moderador te responderá. Si no hay respuesta en 6 horas, el ticket se cierra automáticamente.</p>
+      </div>
+    </div>
+
+    <div class="form-grid" style="margin-bottom:18px">
+      <div class="ticket-card">
+        <div class="ticket-title">Nuevo ticket</div>
+        <div class="form-group" style="margin-top:10px">
+          <label class="form-label" for="supportSubject">Asunto</label>
+          <input id="supportSubject" class="form-input" type="text" maxlength="120" placeholder="Problema con...">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="supportMessage">Mensaje</label>
+          <textarea id="supportMessage" class="form-textarea" maxlength="1000" rows="4" placeholder="Describe tu problema..."></textarea>
+        </div>
+        <button class="btn btn-primary" id="createTicketBtn" style="width:100%;justify-content:center">Crear ticket</button>
+      </div>
+      <div class="ticket-card">
+        <div class="ticket-title">Mis tickets</div>
+        <div id="ticketList" style="margin-top:10px">
+          <div class="empty-state" style="padding:24px"><h3>Sin tickets</h3><p>Aún no has creado ningún ticket.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ticket-card" id="ticketChatCard" style="display:none">
+      <div class="ticket-header">
+        <div>
+          <div class="ticket-title" id="chatTicketTitle">Ticket</div>
+          <div class="ticket-meta" id="chatTicketMeta"></div>
+        </div>
+        <span class="ticket-status open" id="chatTicketStatus">Abierto</span>
+      </div>
+      <div id="chatMessages" class="comments-list" style="margin-top:14px;max-height:360px"></div>
+      <div class="comment-form" style="margin-top:14px">
+        <textarea id="chatInput" class="form-textarea" maxlength="1000" rows="2" placeholder="Escribe una respuesta..."></textarea>
+        <button class="btn btn-primary" id="chatSendBtn" style="margin-top:8px">Enviar</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <a href="/Better-Discovery/terms.html">Términos y condiciones</a>
+    <span>·</span>
+    <a href="/Better-Discovery/privacy.html">Política de privacidad</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/Better-Discovery/js/config.js"></script>
+  <script src="/Better-Discovery/js/app.js"></script>
+  <script>
+    const TICKET_CLOSE_DELAY_MS = 6 * 60 * 60 * 1000;
+    let currentTicketId = null;
+
+    async function loadTickets() {
+      const container = document.getElementById('ticketList');
+      const session = await getSession();
+      const email = getSessionEmail(session);
+      if (!email) { container.innerHTML = '<div class="empty-state" style="padding:24px"><h3>Inicia sesión</h3></div>'; return; }
+      try {
+        const { data, error } = await supabaseClient.from('support_tickets').select('id, subject, status, created_at').eq('user_email', email).order('created_at', { ascending: false });
+        if (error) throw error;
+        const items = Array.isArray(data) ? data : [];
+        if (!items.length) { container.innerHTML = '<div class="empty-state" style="padding:24px"><h3>Sin tickets</h3><p>Aún no has creado ningún ticket.</p></div>'; return; }
+        container.innerHTML = items.map(t => `
+          <div class="ticket-card" data-id="${escapeHtml(t.id)}" style="cursor:pointer">
+            <div class="ticket-header">
+              <div class="ticket-title">${escapeHtml(t.subject)}</div>
+              <span class="ticket-status ${t.status}">${t.status === 'open' ? 'Abierto' : 'Cerrado'}</span>
+            </div>
+            <div class="ticket-meta">${formatDate(t.created_at)}</div>
+          </div>
+        `).join('');
+        container.querySelectorAll('.ticket-card').forEach(card => {
+          card.addEventListener('click', () => openTicket(card.getAttribute('data-id')));
+        });
+      } catch {
+        container.innerHTML = '<div class="empty-state" style="padding:24px"><h3>No se pudieron cargar los tickets</h3></div>';
+      }
+    }
+
+    async function openTicket(id) {
+      currentTicketId = id;
+      const card = document.getElementById('ticketChatCard');
+      card.style.display = '';
+      document.getElementById('chatTicketStatus').className = 'ticket-status';
+      try {
+        const { data, error } = await supabaseClient.from('support_tickets').select('subject, status, created_at').eq('id', id).maybeSingle();
+        if (error) throw error;
+        if (!data) { showToast('Ticket no encontrado', 'error'); return; }
+        document.getElementById('chatTicketTitle').textContent = data.subject;
+        document.getElementById('chatTicketMeta').textContent = 'Creado: ' + formatDate(data.created_at);
+        const statusEl = document.getElementById('chatTicketStatus');
+        statusEl.textContent = data.status === 'open' ? 'Abierto' : 'Cerrado';
+        statusEl.classList.add(data.status);
+        if (data.status === 'closed') document.getElementById('chatInput').disabled = true;
+        await loadMessages(id);
+        await maybeAutoCloseTicket(id, data.created_at);
+      } catch {
+        showToast('No se pudo cargar el ticket', 'error');
+      }
+    }
+
+    async function loadMessages(ticketId) {
+      const container = document.getElementById('chatMessages');
+      try {
+        const { data, error } = await supabaseClient.from('support_messages').select('id, email, message, created_at').eq('ticket_id', ticketId).order('created_at', { ascending: true });
+        if (error) throw error;
+        const items = Array.isArray(data) ? data : [];
+        if (!items.length) { container.innerHTML = ''; return; }
+        container.innerHTML = items.map(msg => `
+          <div class="chat-bubble">
+            <div class="who">${escapeHtml(msg.email || 'Anónimo')}</div>
+            <div class="what">${escapeHtml(msg.message)}</div>
+            <div class="when">${formatDate(msg.created_at)}</div>
+          </div>
+        `).join('');
+        container.scrollTop = container.scrollHeight;
+      } catch {
+        container.innerHTML = '<div class="empty-state" style="padding:24px"><h3>No se pudieron cargar los mensajes</h3></div>';
+      }
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text || !currentTicketId) return;
+      const session = await getSession();
+      const email = getSessionEmail(session) || 'Anónimo';
+      try {
+        const { error } = await supabaseClient.from('support_messages').insert([{ ticket_id: currentTicketId, email, message: text }]);
+        if (error) throw error;
+        input.value = '';
+        await loadMessages(currentTicketId);
+        const card = document.getElementById('ticketChatCard');
+      } catch {
+        showToast('No se pudo enviar el mensaje', 'error');
+      }
+    }
+
+    async function createTicket() {
+      const subject = document.getElementById('supportSubject').value.trim();
+      const message = document.getElementById('supportMessage').value.trim();
+      if (!subject || !message) { showToast('Completa el asunto y el mensaje.', 'error'); return; }
+      const session = await getSession();
+      const email = getSessionEmail(session);
+      if (!email) { showToast('Debes iniciar sesión.', 'error'); return; }
+      try {
+        const { data, error } = await supabaseClient.from('support_tickets').insert([{ user_email: email, subject, status: 'open' }]).select('id').single();
+        if (error) throw error;
+        const ticketId = data.id;
+        await supabaseClient.from('support_messages').insert([{ ticket_id: ticketId, email, message }]);
+        showToast('Ticket creado.', 'success');
+        document.getElementById('supportSubject').value = '';
+        document.getElementById('supportMessage').value = '';
+        await loadTickets();
+        openTicket(ticketId);
+      } catch {
+        showToast('No se pudo crear el ticket.', 'error');
+      }
+    }
+
+    async function maybeAutoCloseTicket(ticketId, createdAt) {
+      const created = new Date(createdAt).getTime();
+      const elapsed = Date.now() - created;
+      const remaining = TICKET_CLOSE_DELAY_MS - elapsed;
+      if (remaining <= 0) { await closeTicket(ticketId, 'system'); return; }
+      setTimeout(async () => {
+        const { data } = await supabaseClient.from('support_tickets').select('status').eq('id', ticketId).maybeSingle();
+        if (data && data.status === 'open') await closeTicket(ticketId, 'system');
+      }, remaining);
+    }
+
+    async function closeTicket(ticketId, closedBy) {
+      try {
+        const { data } = await supabaseClient.from('support_tickets').select('*').eq('id', ticketId).maybeSingle();
+        if (!data || data.status === 'closed') return;
+        const closedTicket = { ...data, closed_at: new Date().toISOString(), closed_by: closedBy };
+        const store = JSON.parse(localStorage.getItem('bd_closed_tickets') || '[]');
+        store.push(closedTicket);
+        localStorage.setItem('bd_closed_tickets', JSON.stringify(store));
+        await supabaseClient.from('support_messages').delete().eq('ticket_id', ticketId);
+        await supabaseClient.from('support_tickets').delete().eq('id', ticketId);
+        showToast('Ticket cerrado.', 'info');
+        if (closedBy !== 'system') await loadTickets();
+        document.getElementById('ticketChatCard').style.display = 'none';
+        currentTicketId = null;
+      } catch {
+        showToast('No se pudo cerrar el ticket.', 'error', 5000);
+      }
+    }
+
+    document.getElementById('createTicketBtn')?.addEventListener('click', createTicket);
+    document.getElementById('chatSendBtn')?.addEventListener('click', sendMessage);
+    document.addEventListener('DOMContentLoaded', async () => {
+      await requireAuth({ redirect: false });
+      await renderAuthNav();
+      await loadTickets();
+    });
+  </script>
+</body>
+</html>
