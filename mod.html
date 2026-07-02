@@ -13,6 +13,10 @@
     .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
     .toolbar input, .toolbar select { background: rgba(20,20,26,.9); border:1px solid var(--border); color: var(--text-primary); padding:10px 12px; border-radius:10px; font-size:.9rem; outline:none; }
     .toolbar input:focus, .toolbar select:focus { border-color: var(--accent); }
+    .tabs { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
+    .tab { padding:8px 14px; border-radius:10px; border:1px solid var(--border); background: var(--bg-card); color: var(--text-primary); cursor:pointer; font:inherit; font-size:.88rem; font-weight:500; transition: border-color .2s, color .2s, background .2s; }
+    .tab:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+    .tab.active { border-color: var(--accent); color:#fff; background: var(--grad-1); }
     .snippet-row { display:grid; grid-template-columns: 1fr auto auto auto auto; gap: 14px; align-items: center; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; transition: border-color .2s; }
     .snippet-row:hover { border-color: var(--accent); }
     .snippet-row .title { font-weight: 600; }
@@ -27,6 +31,13 @@
     .stat { color: var(--text-muted); font-size:.82rem; }
     .req-row { display:grid; grid-template-columns: 1fr auto auto auto; gap: 14px; align-items: center; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
     .req-row .meta { color: var(--text-muted); font-size: .85rem; }
+    .log-row { display:grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: start; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
+    .log-row pre { margin:0; white-space:pre-wrap; word-break:break-word; color:#e5e7eb; font-size:.82rem; background:#0b0b0f; border:1px solid var(--border); border-radius:10px; padding:10px; }
+    .chat-row { display:grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: start; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
+    .chat-bubble { display:flex; flex-direction:column; gap:4px; }
+    .chat-bubble .who { font-weight:600; font-size:.85rem; color:#fff; }
+    .chat-bubble .what { color:#e5e7eb; font-size:.82rem; background:#0b0b0f; border:1px solid var(--border); border-radius:10px; padding:10px; }
+    .sub-card { background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 16px; }
   </style>
 </head>
 <body>
@@ -70,12 +81,40 @@
       </div>
     </div>
 
-    <h2 style="font-size:1.1rem;margin-bottom:10px">🛡️ Solicitudes Discovery+</h2>
-    <div id="modSubs" style="margin-bottom:24px"></div>
+    <div class="tabs">
+      <button class="tab active" data-tab="creations">✨ Creaciones</button>
+      <button class="tab" data-tab="requests">🛡️ Solicitudes Discovery+</button>
+      <button class="tab" data-tab="logs">📋 Logs</button>
+      <button class="tab" data-tab="chat">💬 Chat soporte</button>
+      <button class="tab" data-tab="subscriptions">📦 Suscripciones activas</button>
+    </div>
 
-    <h2 style="font-size:1.1rem;margin-bottom:10px">✨ Creaciones</h2>
-    <div id="modContent"></div>
-    <div id="pagination" class="pagination" style="margin-top:16px"></div>
+    <section id="tab-creations">
+      <h2 style="font-size:1.1rem;margin-bottom:10px">✨ Creaciones</h2>
+      <div id="modContent"></div>
+      <div id="pagination" class="pagination" style="margin-top:16px"></div>
+    </section>
+
+    <section id="tab-requests" style="display:none">
+      <h2 style="font-size:1.1rem;margin-bottom:10px">🛡️ Solicitudes Discovery+</h2>
+      <div id="modSubs"></div>
+    </section>
+
+    <section id="tab-logs" style="display:none">
+      <h2 style="font-size:1.1rem;margin-bottom:10px">📋 Logs de errores</h2>
+      <div id="modLogs"></div>
+    </section>
+
+    <section id="tab-chat" style="display:none">
+      <h2 style="font-size:1.1rem;margin-bottom:10px">💬 Chat soporte</h2>
+      <div id="modChat"></div>
+    </section>
+
+    <section id="tab-subscriptions" style="display:none">
+      <h2 style="font-size:1.1rem;margin-bottom:10px">📦 Suscripciones Discovery+ activas</h2>
+      <div id="modActiveSubs"></div>
+    </section>
+
     <div id="toastAnchor" aria-live="polite"></div>
   </main>
 
@@ -96,6 +135,22 @@
     let currentSort = 'created_at';
     let currentTag = '';
     let currentQuery = '';
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.getAttribute('data-tab') === name));
+      ['creations','requests','logs','chat','subscriptions'].forEach(id => {
+        const el = document.getElementById('tab-' + id);
+        if (el) el.style.display = id === name ? '' : 'none';
+      });
+      if (name === 'requests') loadSubRequests();
+      if (name === 'logs') loadLogs();
+      if (name === 'chat') loadChat();
+      if (name === 'subscriptions') loadActiveSubs();
+    }
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => switchTab(tab.getAttribute('data-tab')));
+    });
 
     async function loadAll() {
       const content = document.getElementById('modContent');
@@ -223,8 +278,8 @@
       }
     }
 
-    async function loadSubRequests() {
-      const container = document.getElementById('modSubs');
+    async function loadLogs() {
+      const container = document.getElementById('modLogs');
       if (!container) return;
       if (!IS_CONFIGURED || !supabaseClient) {
         container.innerHTML = configNoticeHtml();
@@ -232,78 +287,133 @@
       }
       try {
         const { data, error } = await supabaseClient
-          .from('subscription_requests')
-          .select('id, user_email, status, created_at, approved_by')
-          .eq('status', 'pending')
+          .from('error_logs')
+          .select('id, message, stack, url, created_at')
+          .order('created_at', { ascending: false })
+          .limit(50);
+        if (error) throw error;
+        const items = Array.isArray(data) ? data : [];
+        if (!items.length) {
+          container.innerHTML = '<div class="empty-state"><h3>Sin logs</h3><p>Aún no hay errores registrados.</p></div>';
+          return;
+        }
+        container.innerHTML = '<div style="display:flex; flex-direction:column; gap:14px">' + items.map(log => `
+          <div class="log-row">
+            <div>
+              <div class="title">${escapeHtml(log.message || 'Error')}</div>
+              <pre>${escapeHtml(log.stack || '')}</pre>
+              <div class="meta">${escapeHtml(log.url || '')} · ${formatDate(log.created_at)}</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-outline" data-copy-log="${escapeHtml(log.id)}">📋 Copiar</button>
+              <button class="btn btn-outline" data-clear-log="${escapeHtml(log.id)}" style="border-color:rgba(239,68,68,.35);color:#f87171">🗑 Borrar</button>
+            </div>
+          </div>
+        `).join('') + '</div>';
+        container.querySelectorAll('button[data-copy-log]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-copy-log');
+            const log = items.find(i => i.id === id);
+            if (!log) return;
+            await navigator.clipboard.writeText(`${log.message}\n\n${log.stack}\n${log.url}\n${log.created_at}`);
+            showToast('Log copiado.', 'success');
+          });
+        });
+        container.querySelectorAll('button[data-clear-log]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-clear-log');
+            await clearLog(id);
+          });
+        });
+      } catch {
+        container.innerHTML = '<div class="empty-state"><h3>No se pudieron cargar los logs</h3><p>Revisa la conexión con Supabase.</p></div>';
+      }
+    }
+
+    async function clearLog(id) {
+      try {
+        const { error } = await supabaseClient
+          .from('error_logs')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        showToast('Log eliminado.', 'info');
+        await loadLogs();
+      } catch (err) {
+        showToast('Error al borrar log: ' + err.message, 'error', 5000);
+      }
+    }
+
+    async function loadChat() {
+      const container = document.getElementById('modChat');
+      if (!container) return;
+      if (!IS_CONFIGURED || !supabaseClient) {
+        container.innerHTML = configNoticeHtml();
+        return;
+      }
+      try {
+        const { data, error } = await supabaseClient
+          .from('support_messages')
+          .select('id, email, message, created_at')
           .order('created_at', { ascending: true });
         if (error) throw error;
         const items = Array.isArray(data) ? data : [];
         if (!items.length) {
-          container.innerHTML = '<div class="empty-state"><h3>Sin solicitudes pendientes</h3><p>Cuando alguien solicite Discovery+ aparecerá aquí.</p></div>';
+          container.innerHTML = '<div class="empty-state"><h3>Sin mensajes</h3><p>Aún no hay mensajes de soporte.</p></div>';
           return;
         }
-        container.innerHTML = '<div style="display:flex; flex-direction:column; gap:14px">' + items.map(r => `
-          <div class="req-row" data-id="${escapeHtml(r.id)}">
-            <div>
-              <div class="title">${escapeHtml(r.user_email)}</div>
-              <div class="meta">${escapeHtml(r.approved_by || 'Sin nota')} · ${formatDate(r.created_at)}</div>
+        container.innerHTML = '<div style="display:flex; flex-direction:column; gap:14px">' + items.map(msg => `
+          <div class="chat-row">
+            <div class="chat-bubble">
+              <div class="who">${escapeHtml(msg.email || 'Anónimo')}</div>
+              <div class="what">${escapeHtml(msg.message)}</div>
+              <div class="meta">${formatDate(msg.created_at)}</div>
             </div>
-            <div class="stat"><span class="badge">Pendiente</span></div>
-            <div style="display:flex; gap:8px; justify-content:flex-end;">
-              <button class="btn btn-primary" data-approve="${escapeHtml(r.id)}" data-email="${escapeHtml(r.user_email)}">Aprobar</button>
-              <button class="btn btn-outline" data-reject="${escapeHtml(r.id)}" style="border-color:rgba(239,68,68,.35);color:#f87171">Rechazar</button>
-            </div>
+            <button class="btn btn-outline" data-reply="${escapeHtml(msg.id)}">Responder</button>
           </div>
         `).join('') + '</div>';
-
-        container.querySelectorAll('button[data-approve]').forEach(btn => {
+        container.querySelectorAll('button[data-reply]').forEach(btn => {
           btn.addEventListener('click', async () => {
-            const id = btn.getAttribute('data-approve');
-            const email = btn.getAttribute('data-email');
-            await approveRequest(id, email);
-          });
-        });
-        container.querySelectorAll('button[data-reject]').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            const id = btn.getAttribute('data-reject');
-            await rejectRequest(id);
+            const id = btn.getAttribute('data-reply');
+            const text = prompt('Respuesta de soporte:');
+            if (!text) return;
+            await supabaseClient.from('support_messages').insert([{ id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`, email: 'soporte', message: `[Soporte] ${text}`, parent_id: id }]);
+            showToast('Respuesta enviada.', 'success');
+            await loadChat();
           });
         });
       } catch {
-        container.innerHTML = '<div class="empty-state"><h3>No se pudieron cargar las solicitudes</h3><p>Revisa la conexión con Supabase.</p></div>';
+        container.innerHTML = '<div class="empty-state"><h3>No se pudo cargar el chat</h3><p>Revisa la conexión con Supabase.</p></div>';
       }
     }
 
-    async function approveRequest(id, email) {
+    async function loadActiveSubs() {
+      const container = document.getElementById('modActiveSubs');
+      if (!container) return;
+      if (!IS_CONFIGURED || !supabaseClient) {
+        container.innerHTML = configNoticeHtml();
+        return;
+      }
       try {
-        const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-        const { error } = await supabaseClient
-          .from('subscription_requests')
-          .update({ status: 'approved', approved_at: new Date().toISOString() })
-          .eq('id', id);
-        if (error) throw error;
-        const { error: upErr } = await supabaseClient
+        const { data, error } = await supabaseClient
           .from('subscriptions')
-          .upsert({ user_email: email, plan: 'discovery_plus', status: 'active', expires_at: expiresAt, updated_at: new Date().toISOString() }, { onConflict: 'user_email' });
-        if (upErr) throw upErr;
-        showToast('Solicitud aprobada.', 'success');
-        await loadSubRequests();
-      } catch (err) {
-        showToast('Error al aprobar: ' + err.message, 'error', 5000);
-      }
-    }
-
-    async function rejectRequest(id) {
-      try {
-        const { error } = await supabaseClient
-          .from('subscription_requests')
-          .update({ status: 'rejected' })
-          .eq('id', id);
+          .select('user_email, plan, status, expires_at, updated_at')
+          .eq('status', 'active')
+          .order('updated_at', { ascending: false });
         if (error) throw error;
-        showToast('Solicitud rechazada.', 'info');
-        await loadSubRequests();
-      } catch (err) {
-        showToast('Error al rechazar: ' + err.message, 'error', 5000);
+        const items = Array.isArray(data) ? data : [];
+        if (!items.length) {
+          container.innerHTML = '<div class="empty-state"><h3>Sin suscripciones activas</h3><p>Aún no hay suscripciones Discovery+ activas.</p></div>';
+          return;
+        }
+        container.innerHTML = '<div style="display:flex; flex-direction:column; gap:14px">' + items.map(sub => `
+          <div class="sub-card">
+            <div class="title">${escapeHtml(sub.user_email)}</div>
+            <div class="meta">Plan: ${escapeHtml(sub.plan)} · Expira: ${sub.expires_at ? formatDate(sub.expires_at) : '—'} · Actualizado: ${formatDate(sub.updated_at)}</div>
+          </div>
+        `).join('') + '</div>';
+      } catch {
+        container.innerHTML = '<div class="empty-state"><h3>No se pudieron cargar las suscripciones</h3><p>Revisa la conexión con Supabase.</p></div>';
       }
     }
 

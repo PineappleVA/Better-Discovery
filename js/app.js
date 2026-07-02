@@ -10,6 +10,7 @@ const PROFILE_PAGE = '/Better-Discovery/profile.html';
 const PROFILE_STORAGE_KEY = 'bd_profile';
 const FOLLOW_STORAGE_KEY = 'bd_followed_authors';
 const OWNED_SNIPPETS_STORAGE_KEY = 'bd_owned_snippets';
+const SETUP_STORAGE_KEY = 'bd_setup_done';
 const textEncoder = new TextEncoder();
 
 const MODERATOR_EMAILS = new Set([
@@ -271,6 +272,8 @@ function getProfileData() {
   return {
     displayName: String(profile.displayName || DEFAULT_AUTHOR_NAME).trim(),
     bio: String(profile.bio || '').trim(),
+    avatar: String(profile.avatar || '').trim(),
+    tag: String(profile.tag || '').trim() || null,
   };
 }
 
@@ -278,9 +281,27 @@ function saveProfileData(profile) {
   const next = {
     displayName: String(profile.displayName || DEFAULT_AUTHOR_NAME).trim() || DEFAULT_AUTHOR_NAME,
     bio: String(profile.bio || '').trim(),
+    avatar: String(profile.avatar || '').trim(),
+    tag: String(profile.tag || '').trim() || null,
   };
   writeJsonStorage(PROFILE_STORAGE_KEY, next);
   return next;
+}
+
+function isSetupDone() {
+  return readJsonStorage(SETUP_STORAGE_KEY, false);
+}
+
+function markSetupDone() {
+  writeJsonStorage(SETUP_STORAGE_KEY, true);
+}
+
+async function requireSetupThen(target) {
+  if (!isSetupDone()) {
+    window.location.href = '/Better-Discovery/setup.html';
+  } else if (target) {
+    window.location.href = target;
+  }
 }
 
 function getOwnedSnippetIds() {

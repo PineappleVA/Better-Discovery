@@ -170,6 +170,11 @@
           setTimeout(() => { window.location.href = '/Better-Discovery/login.html'; }, 600);
         });
       }
+      const done = isSetupDone();
+      if (session && !done) {
+        window.location.replace('/Better-Discovery/setup.html');
+        return;
+      }
       loadSnippets();
     }
     document.addEventListener('DOMContentLoaded', initPage);

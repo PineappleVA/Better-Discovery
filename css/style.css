@@ -1082,3 +1082,73 @@ html {
   .nav-links a:not(.btn) { display: none; }
   .hero { padding: 50px 16px 40px; }
 }
+
+@keyframes fadeScale {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes pulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(99,102,241,.25); }
+  70% { box-shadow: 0 0 0 12px rgba(99,102,241,0); }
+  100% { box-shadow: 0 0 0 0 rgba(99,102,241,0); }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.avatar-shell {
+  animation: float 6s ease-in-out infinite;
+}
+.avatar-shell:hover {
+  animation: pulseRing 1.5s ease infinite;
+}
+
+.nav-logo {
+  transition: color .2s, transform .15s;
+}
+.nav-logo:hover {
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.snippet-card, .profile-card, .plan, .feature, .creation-card {
+  animation: fadeScale .45s ease both;
+}
+.snippet-card:hover, .profile-card:hover, .plan:hover, .feature:hover, .creation-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(99,102,241,.35);
+  box-shadow: var(--shadow);
+}
+
+.card-thumb { animation: shimmer 8s ease infinite; }
+.snippet-card { animation: borderGlow 4s ease infinite; }
+.snippet-card:hover { animation: none; }
+
+.form-input, .form-textarea, .sort-select, .toolbar input, .toolbar select {
+  transition: border-color .2s, box-shadow .2s, transform .15s;
+}
+.form-input:focus, .form-textarea:focus, .sort-select:focus, .toolbar input:focus, .toolbar select:focus {
+  transform: translateY(-1px);
+}
+
+.btn {
+  transition: background .2s, transform .12s, box-shadow .2s, opacity .2s;
+}
+.btn:active { transform: translateY(0) scale(0.98); }
+
+.comment {
+  animation: fadeUp .35s ease both;
+}
+
+html {
+  scroll-behavior: smooth;
+}
