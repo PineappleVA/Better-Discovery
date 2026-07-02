@@ -15,14 +15,19 @@
       flex-direction: column;
       gap: 16px;
       color: var(--text-muted);
+      animation: fadeUp .6s ease both;
     }
     #errorScreen {
       display: none;
       text-align: center;
       padding: 80px 24px;
       color: var(--text-muted);
+      animation: fadeUp .5s ease both;
     }
     #mainContent { display: none; }
+    .view-layout {
+      animation: fadeUp .55s ease both;
+    }
     .tag-badge {
       display: inline-block;
       padding: 3px 10px;
@@ -153,7 +158,7 @@
         <iframe id="previewFrame" sandbox="allow-scripts allow-forms allow-modals allow-popups" title="Vista previa HTML" allowfullscreen></iframe>
       </div>
       <aside class="view-sidebar">
-        <div class="panel">
+        <div class="panel" style="animation: fadeUp .5s ease both">
           <div class="panel-label">Creación</div>
           <h1 class="view-title" id="snippetTitle">—</h1>
           <p class="view-desc" id="snippetDesc"></p>
@@ -167,7 +172,7 @@
             <span id="snippetTagWrap" style="display:none">🏷️ <span class="tag-badge" id="snippetTag"></span></span>
           </div>
         </div>
-        <div class="panel">
+        <div class="panel" style="animation: fadeUp .65s ease both">
           <div class="panel-label">Acciones</div>
           <button class="like-btn" id="likeBtn" onclick="handleLike()">
             <span id="likeIcon">❤️</span>
@@ -177,13 +182,16 @@
           <button class="like-btn" id="followBtn" onclick="toggleFollow()" style="margin-top:12px;background:rgba(99,102,241,.08);border-color:rgba(99,102,241,.25);color:var(--text-primary)">
             👤 Seguir autor
           </button>
+          <button class="like-btn" id="copyLinkBtn" style="margin-top:10px">
+            🔗 Copiar enlace
+          </button>
           <div id="modPanel" class="mod-panel" style="display:none">
             <div class="panel-label">Panel de moderación</div>
             <button class="btn btn-outline" id="modEditBtn" style="flex:1;min-width:120px">✏️ Editar</button>
             <button class="btn btn-outline" id="modDeleteBtn" style="flex:1;min-width:120px;border-color:rgba(239,68,68,.35);color:#f87171">🗑 Eliminar</button>
           </div>
         </div>
-        <div class="panel" style="flex:1">
+        <div class="panel" style="flex:1;animation: fadeUp .8s ease both">
           <div class="panel-label">Comentarios</div>
           <div class="comments-list" id="commentsList">
             <div class="no-comments">Aún no hay comentarios. ¡Escribe el primero!</div>
@@ -432,10 +440,21 @@
       document.getElementById('errorTitle').textContent = title;
       document.getElementById('errorMsg').textContent = msg;
     }
+    async function copyLink() {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        const btn = document.getElementById('copyLinkBtn');
+        if (btn) { btn.textContent = '✅ Enlace copiado'; setTimeout(() => { btn.textContent = '🔗 Copiar enlace'; }, 1500); }
+      } catch {
+        showToast('No se pudo copiar el enlace.', 'error');
+      }
+    }
     async function initPage() {
       await requireAuth({ redirect: false });
       await renderAuthNav();
       loadSnippet();
+      const copyBtn = document.getElementById('copyLinkBtn');
+      if (copyBtn) copyBtn.addEventListener('click', copyLink);
     }
     document.addEventListener('DOMContentLoaded', initPage);
   </script>

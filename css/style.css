@@ -941,6 +941,44 @@ nav {
   100% { transform: scale(1); }
 }
 
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color .2s, color .2s, background .2s, transform .15s;
+}
+.nav-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+.nav-pill.active {
+  border-color: var(--accent);
+  color: #fff;
+  background: var(--grad-1);
+}
+
+.like-btn.liked { background: rgba(255, 77, 109, 0.14); border-color: #ff4d6d; color: #ff4d6d; animation: popLike 0.35s ease; }
+
 .reveal {
   opacity: 0;
   animation: fadeUp 0.45s ease forwards;
