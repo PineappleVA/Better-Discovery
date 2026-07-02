@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToS – Better Discovery</title>
+  <meta name="description" content="Términos y condiciones de uso de Better Discovery.">
+  <link rel="stylesheet" href="/Better-Discovery/css/style.css">
+  <style>
+    .policy-page {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 50px 24px 90px;
+    }
+    .policy-page h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #f0f0f0 40%, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .policy-page>p,
+    .policy-page li {
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+    .policy-page h2 {
+      margin-top: 34px;
+      margin-bottom: 10px;
+      font-size: 1.08rem;
+    }
+    .policy-box {
+      background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/Better-Discovery/index.html" class="nav-logo">🚀 Better Discovery</a>
+    <div class="nav-links">
+      <a href="/Better-Discovery/index.html">Explorar</a>
+      <a href="/Better-Discovery/about.html">Acerca de</a>
+      <a href="/Better-Discovery/terms.html" class="active">Términos</a>
+    </div>
+    <div class="nav-auth" id="navAuth"></div>
+  </nav>
+
+  <main class="policy-page">
+    <h1>Términos y condiciones</h1>
+    <p>Última actualización: 19 de junio de 2026.</p>
+    <p>
+      Estos términos regulan el uso de Better Discovery, una galería comunitaria.
+      Al usar la plataforma aceptas estas condiciones y confirmas que entiendes cómo funciona el servicio.
+    </p>
+
+    <div class="policy-box">
+      <h2>1. Qué ofrece el servicio</h2>
+      <p>
+        Better Discovery permite publicar, descubrir y comentar creaciones HTML. El sitio está diseñado para
+        funcionar como una experiencia estática, con autenticación y persistencia apoyadas en servicios externos.
+      </p>
+
+      <h2>2. Cuenta y responsabilidad</h2>
+      <p>
+        Eres responsable de la información que compartes, del contenido que publicas y de cualquier actividad
+        realizada desde tu cuenta. Si detectas un uso no autorizado, debes cambiar tus credenciales y revisar tu sesión.
+      </p>
+
+      <h2>3. Contenido permitido</h2>
+      <ul>
+        <li>Creaciones HTML completas que puedan renderizarse en un navegador.</li>
+        <li>CSS y JavaScript embebidos dentro del propio documento HTML.</li>
+        <li>Contenido original o contenido sobre el que tengas derechos suficientes para publicar.</li>
+      </ul>
+
+      <h2>4. Contenido prohibido</h2>
+      <ul>
+        <li>Archivos ZIP, paquetes comprimidos u otros formatos no HTML.</li>
+        <li>Copias, clones o remixes no autorizados de creaciones ajenas.</li>
+        <li>Contenido ilegal, fraudulento, difamatorio, malicioso o que abuse de terceros.</li>
+        <li>Código destinado a robar credenciales, explotar la plataforma o dañar el navegador de otras personas.</li>
+      </ul>
+
+      <h2>5. Moderación</h2>
+      <p>
+        Podemos ocultar, rechazar o eliminar contenido que incumpla estas reglas. También podemos limitar funciones
+        si se detecta abuso, spam, automatización indebida o comportamiento que degrade la experiencia del resto.
+      </p>
+
+      <h2>6. Propiedad intelectual</h2>
+      <p>
+        Conservas la propiedad de tus creaciones, pero nos concedes una licencia no exclusiva para mostrarlas,
+        almacenarlas y reproducirlas dentro de Better Discovery con el único fin de operar el servicio.
+      </p>
+
+      <h2>7. Limitación de responsabilidad</h2>
+      <p>
+        El servicio se ofrece “tal cual”. No garantizamos disponibilidad continua, ausencia de errores ni que el contenido
+        publicado por otras personas sea exacto, seguro o adecuado para todos los públicos.
+      </p>
+
+      <h2>8. Cambios</h2>
+      <p>
+        Podemos actualizar estas condiciones cuando sea necesario. Si el cambio es material, intentaremos reflejarlo
+        en la interfaz o en la documentación del proyecto.
+      </p>
+
+      <h2>9. Discovery+</h2>
+      <p>
+        Discovery+ es una suscripción opcional que amplía el almacenamiento por creación, añade un badge exclusivo
+        y beneficios adicionales. La suscripción se solicita desde la plataforma, se aprueba manualmente por el equipo
+        de moderación y puede ser cancelada en cualquier momento. El precio es de <strong>3,99 €/mes</strong>.
+        Better Discovery no procesa pagos automáticos en esta versión; la activación se realiza mediante aprobación interna.
+      </p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <a href="/Better-Discovery/privacy.html">Política de privacidad</a>
+    <span>·</span>
+    <a href="/Better-Discovery/about.html">Acerca de</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/Better-Discovery/js/config.js"></script>
+  <script src="/Better-Discovery/js/app.js"></script>
+  <script>
+    async function initPage() {
+      await requireAuth({ redirect: false });
+      await renderAuthNav();
+    }
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>

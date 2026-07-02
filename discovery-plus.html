@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discovery+ – Better Discovery</title>
+  <link rel="stylesheet" href="/Better-Discovery/css/style.css">
+  <style>
+    .plus-page { max-width: 1100px; margin: 0 auto; padding: 38px 24px 90px; animation: fadeUp .45s ease both; }
+    .plus-hero { display:grid; grid-template-columns: 1fr; gap:18px; align-items:center; margin-bottom:26px; }
+    .plus-hero .hero-badge { display:inline-flex; align-items:center; gap:8px; background: linear-gradient(135deg,#ff7a00,#ff4500); color:#fff; padding:6px 12px; border-radius:999px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-size:.78rem; }
+    .plus-hero h1 { font-size: clamp(2rem,4vw,3rem); letter-spacing:-.03em; line-height:1.05; }
+    .plus-hero h1 span { background: linear-gradient(90deg,#ff7a00,#ff4500,#ffb347); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .plus-sub { color: var(--text-muted); font-size: 1rem; line-height: 1.6; max-width: 720px; }
+    .plans { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 22px 0; }
+    .plan { background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius:18px; padding:22px; position:relative; }
+    .plan.pro { border-color: rgba(255,69,0,.35); box-shadow: 0 18px 40px rgba(255,69,0,.15); }
+    .plan h3 { font-size:1.1rem; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+    .plan .price { font-size:1.6rem; font-weight:800; margin:6px 0 10px; }
+    .plan .price small { font-size:.85rem; color: var(--text-muted); font-weight:500; }
+    .plan ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+    .plan li { display:flex; gap:10px; color: var(--text-primary); font-size:.92rem; line-height:1.45; }
+    .plan li.disabled { color: var(--text-muted); text-decoration: line-through; }
+    .plan li.disabled::before { content:"✕"; color:#f87171; font-weight:700; }
+    .plan li:not(.disabled)::before { content:"✓"; color:#22c55e; font-weight:700; }
+    .plan .cta { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
+    .subscription-card { margin-top:10px; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius:18px; padding:22px; }
+    .subscription-card h3 { margin-bottom:10px; }
+    .status-row { display:flex; gap:12px; flex-wrap:wrap; margin-top:14px; }
+    .status-chip { padding:10px 12px; border-radius:12px; border:1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); }
+    .status-chip .label { color: var(--text-muted); font-size:.76rem; }
+    .status-chip .value { font-weight:700; }
+    .form-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:14px; }
+    @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+    .featured { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom:22px; }
+    .feature { background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius:16px; padding:18px; }
+    .feature h4 { margin-bottom:8px; font-size:1rem; }
+    .feature p { color: var(--text-muted); font-size:.88rem; line-height:1.5; }
+    .trust { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; color: var(--text-muted); font-size:.85rem; }
+    .trust span { display:inline-flex; align-items:center; gap:6px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/Better-Discovery/index.html" class="nav-logo">🚀 Better Discovery</a>
+    <div class="nav-links">
+      <a href="/Better-Discovery/index.html">Explorar</a>
+      <a href="/Better-Discovery/about.html">Acerca de</a>
+      <a href="/Better-Discovery/discovery-plus.html" class="btn btn-primary">Discovery+</a>
+    </div>
+    <div class="nav-auth" id="navAuth"></div>
+  </nav>
+
+  <main class="plus-page">
+    <section class="plus-hero">
+      <div>
+        <div class="hero-badge">Discovery+</div>
+        <h1>Sube más, destaca más,<br><span>comparte sin límites</span></h1>
+        <p class="plus-sub">Evoluciona tu experiencia con más almacenamiento, beneficios exclusivos y prioridad en la plataforma.</p>
+        <div class="trust" style="margin-top:14px">
+          <span>🔒 Pago seguro</span>
+          <span>👤 Para creadores</span>
+          <span>⚡ Activación tras aprobación</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="featured">
+      <div class="feature">
+        <h4>💾 5 MB por creación</h4>
+        <p>Olvídate de recortar código. Sube proyectos más grandes con assets, estilos y scripts integrados.</p>
+      </div>
+      <div class="feature">
+        <h4>🛡️ Badge exclusivo</h4>
+        <p>Distínguete con un badge visible en tu perfil y en tus creaciones.</p>
+      </div>
+      <div class="feature">
+        <h4>⏱️ Ping 24h</h4>
+        <p>Recibe actualizaciones, recordatorios y métricas diarias para mantener tu perfil activo.</p>
+      </div>
+      <div class="feature">
+        <h4>⚡ Aprobación rápida</h4>
+        <p>Un moderador revisa tu solicitud y activa tu acceso en el menor tiempo posible.</p>
+      </div>
+    </div>
+
+    <div class="plans">
+      <div class="plan">
+        <h3>🟢 Free</h3>
+        <div class="price">0 € <small>/mes</small></div>
+        <ul>
+          <li>1 MB por creación</li>
+          <li>Badge básico</li>
+          <li>Soporte comunitario</li>
+          <li class="disabled">Ping 24h</li>
+          <li class="disabled">Almacenamiento ampliado</li>
+        </ul>
+        <div class="cta">
+          <span class="btn btn-outline" style="justify-content:center">Plan actual</span>
+        </div>
+      </div>
+      <div class="plan pro">
+        <div class="hero-badge" style="position:absolute;top:-12px;right:14px">Recomendado</div>
+        <h3>🟠 Discovery+</h3>
+        <div class="price">3,99 € <small>/mes</small></div>
+        <ul>
+          <li>5 MB por creación</li>
+          <li>Badge exclusivo Discovery+</li>
+          <li>Ping 24h y métricas diarias</li>
+          <li>Aprobación rápida</li>
+          <li>Prioridad en soporte</li>
+        </ul>
+        <div class="cta">
+          <button class="btn btn-primary" id="openBuyBtn" style="justify-content:center">Suscribirme a Discovery+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="subscription-card" id="subscriptionCard">
+      <h3>Tu suscripción</h3>
+      <p style="color:var(--text-muted);margin-bottom:10px">Gestiona tu acceso y solicita Discovery+ en unos clics.</p>
+      <div class="status-row">
+        <div class="status-chip"><span class="label">Estado</span><div class="value" id="plusStatus">No activa</div></div>
+        <div class="status-chip"><span class="label">Límite</span><div class="value" id="plusLimit">1 MB</div></div>
+        <div class="status-chip"><span class="label">Precio</span><div class="value">3,99 €/mes</div></div>
+      </div>
+      <div id="toastAnchor" aria-live="polite"></div>
+
+      <div id="buyForm" style="display:none;margin-top:18px">
+        <p style="color:var(--text-muted);margin-bottom:10px">Completa el formulario y enviarás una solicitud de suscripción. Un moderador la revisará y activará tu acceso.</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="buyEmail">Correo</label>
+            <input id="buyEmail" class="form-input" type="email" required placeholder="tu@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="buyName">Nombre público</label>
+            <input id="buyName" class="form-input" type="text" maxlength="60" placeholder="Tu nombre">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:12px">
+          <label class="form-label" for="buyNote">Nota para el moderador <span class="hint">opcional</span></label>
+          <textarea id="buyNote" class="form-textarea" maxlength="240" rows="2" placeholder="Motivo o comentario breve…"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+          <button class="btn btn-primary" id="submitBuyBtn">Enviar solicitud</button>
+          <button class="btn btn-outline" id="cancelBuyBtn">Cancelar</button>
+          <span id="buyError" style="color:#f87171;font-size:.85rem"></span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <a href="/Better-Discovery/terms.html">Términos y condiciones</a>
+    <span>·</span>
+    <a href="/Better-Discovery/privacy.html">Política de privacidad</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/Better-Discovery/js/config.js"></script>
+  <script src="/Better-Discovery/js/app.js"></script>
+  <script>
+    async function loadSubscriptionStatus() {
+      const statusEl = document.getElementById('plusStatus');
+      const limitEl = document.getElementById('plusLimit');
+      const openBtn = document.getElementById('openBuyBtn');
+      if (!statusEl || !limitEl || !openBtn) return;
+
+      const session = await getSession();
+      const email = getSessionEmail(session);
+      if (!email) {
+        statusEl.textContent = 'Inicia sesión';
+        limitEl.textContent = '1 MB';
+        openBtn.textContent = 'Iniciar sesión';
+        openBtn.onclick = () => { window.location.href = '/Better-Discovery/login.html'; };
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('subscriptions')
+          .select('plan, status, expires_at')
+          .eq('user_email', email)
+          .maybeSingle();
+        if (error) throw error;
+
+        const isActive = data && data.status === 'active' && (!data.expires_at || new Date(data.expires_at).getTime() > Date.now());
+        if (isActive) {
+          statusEl.textContent = 'Activa';
+          limitEl.textContent = '5 MB';
+          openBtn.textContent = 'Gestionar suscripción';
+          openBtn.disabled = true;
+          openBtn.style.opacity = '0.6';
+        } else {
+          const isPending = data && data.status === 'pending';
+          statusEl.textContent = isPending ? 'Pendiente' : 'No activa';
+          limitEl.textContent = '1 MB';
+          openBtn.textContent = isPending ? 'Solicitud enviada' : 'Suscribirme a Discovery+';
+          openBtn.disabled = isPending;
+          openBtn.style.opacity = isPending ? '0.6' : '1';
+        }
+      } catch {
+        statusEl.textContent = 'No activa';
+        limitEl.textContent = '1 MB';
+        openBtn.textContent = 'Suscribirme a Discovery+';
+      }
+    }
+
+    document.getElementById('openBuyBtn')?.addEventListener('click', () => {
+      const form = document.getElementById('buyForm');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    });
+
+    document.getElementById('cancelBuyBtn')?.addEventListener('click', () => {
+      document.getElementById('buyForm').style.display = 'none';
+      document.getElementById('buyError').textContent = '';
+    });
+
+    document.getElementById('submitBuyBtn')?.addEventListener('click', async () => {
+      const errorEl = document.getElementById('buyError');
+      const session = await getSession();
+      const emailInput = document.getElementById('buyEmail');
+      const nameInput = document.getElementById('buyName');
+      const noteInput = document.getElementById('buyNote');
+      const email = (emailInput?.value || '').trim();
+      const name = (nameInput?.value || '').trim();
+      const note = (noteInput?.value || '').trim();
+      errorEl.textContent = '';
+
+      if (!supabaseClient || !IS_CONFIGURED) {
+        errorEl.textContent = 'No se pudo conectar con el servicio. Inténtalo más tarde.';
+        return;
+      }
+      if (!session) {
+        errorEl.textContent = 'Debes iniciar sesión para continuar.';
+        return;
+      }
+      const sessionEmail = getSessionEmail(session);
+      if (!email || !email.includes('@')) {
+        errorEl.textContent = 'Introduce un correo válido.';
+        return;
+      }
+      if (!name) {
+        errorEl.textContent = 'Introduce tu nombre público.';
+        return;
+      }
+
+      try {
+        const btn = document.getElementById('submitBuyBtn');
+        btn.disabled = true;
+        btn.textContent = 'Enviando solicitud…';
+        const { error } = await supabaseClient
+          .from('subscription_requests')
+          .insert([{ user_email: sessionEmail, plan: 'discovery_plus', status: 'pending', approved_by: note || null }]);
+        if (error) throw error;
+        showToast('Solicitud enviada. Un moderador la revisará pronto.', 'success');
+        document.getElementById('buyForm').style.display = 'none';
+        document.getElementById('plusStatus').textContent = 'Pendiente';
+        document.getElementById('plusLimit').textContent = '1 MB';
+      } catch (err) {
+        errorEl.textContent = 'No se pudo enviar la solicitud. Inténtalo de nuevo.';
+      } finally {
+        const btn = document.getElementById('submitBuyBtn');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Enviar solicitud';
+        }
+      }
+    });
+
+    async function initPage() {
+      await requireAuth({ redirect: false });
+      await renderAuthNav();
+      const session = await getSession();
+      const emailInput = document.getElementById('buyEmail');
+      const nameInput = document.getElementById('buyName');
+      if (session) {
+        const sessionEmail = getSessionEmail(session);
+        if (sessionEmail) emailInput.value = sessionEmail;
+        const profile = getProfileData();
+        if (profile.displayName && profile.displayName !== DEFAULT_AUTHOR_NAME) nameInput.value = profile.displayName;
+      }
+      await loadSubscriptionStatus();
+    }
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>
