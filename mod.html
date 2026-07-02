@@ -218,6 +218,90 @@
       }
     }
 
+    async function loadSubRequests() {
+      const container = document.getElementById('modSubs');
+      if (!container) return;
+      if (!IS_CONFIGURED || !supabaseClient) {
+        container.innerHTML = configNoticeHtml();
+        return;
+      }
+      try {
+        const { data, error } = await supabaseClient
+          .from('subscription_requests')
+          .select('id, user_email, status, created_at, approved_by')
+          .eq('status', 'pending')
+          .order('created_at', { ascending: true });
+        if (error) throw error;
+        const items = Array.isArray(data) ? data : [];
+        if (!items.length) {
+          container.innerHTML = '<div class="empty-state"><h3>Sin solicitudes pendientes</h3><p>Cuando alguien solicite Discovery+ aparecerá aquí.</p></div>';
+          return;
+        }
+        container.innerHTML = '<div style="display:flex; flex-direction:column; gap:14px">' + items.map(r => `
+          <div class="req-row" data-id="${escapeHtml(r.id)}">
+            <div>
+              <div class="title">${escapeHtml(r.user_email)}</div>
+              <div class="meta">${escapeHtml(r.approved_by || 'Sin nota')} · ${formatDate(r.created_at)}</div>
+            </div>
+            <div class="stat"><span class="badge">Pendiente</span></div>
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+              <button class="btn btn-primary" data-approve="${escapeHtml(r.id)}" data-email="${escapeHtml(r.user_email)}">Aprobar</button>
+              <button class="btn btn-outline" data-reject="${escapeHtml(r.id)}" style="border-color:rgba(239,68,68,.35);color:#f87171">Rechazar</button>
+            </div>
+          </div>
+        `).join('') + '</div>';
+
+        container.querySelectorAll('button[data-approve]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-approve');
+            const email = btn.getAttribute('data-email');
+            await approveRequest(id, email);
+          });
+        });
+        container.querySelectorAll('button[data-reject]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-reject');
+            await rejectRequest(id);
+          });
+        });
+      } catch {
+        container.innerHTML = '<div class="empty-state"><h3>No se pudieron cargar las solicitudes</h3><p>Revisa la conexión con Supabase.</p></div>';
+      }
+    }
+
+    async function approveRequest(id, email) {
+      try {
+        const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        const { error } = await supabaseClient
+          .from('subscription_requests')
+          .update({ status: 'approved', approved_at: new Date().toISOString() })
+          .eq('id', id);
+        if (error) throw error;
+        const { error: upErr } = await supabaseClient
+          .from('subscriptions')
+          .upsert({ user_email: email, plan: 'discovery_plus', status: 'active', expires_at: expiresAt, updated_at: new Date().toISOString() }, { onConflict: 'user_email' });
+        if (upErr) throw upErr;
+        showToast('Solicitud aprobada.', 'success');
+        await loadSubRequests();
+      } catch (err) {
+        showToast('Error al aprobar: ' + err.message, 'error', 5000);
+      }
+    }
+
+    async function rejectRequest(id) {
+      try {
+        const { error } = await supabaseClient
+          .from('subscription_requests')
+          .update({ status: 'rejected' })
+          .eq('id', id);
+        if (error) throw error;
+        showToast('Solicitud rechazada.', 'info');
+        await loadSubRequests();
+      } catch (err) {
+        showToast('Error al rechazar: ' + err.message, 'error', 5000);
+      }
+    }
+
     function renderList() {
       const content = document.getElementById('modContent');
       if (!snippets.length) {

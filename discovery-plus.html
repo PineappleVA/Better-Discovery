@@ -20,7 +20,9 @@
     .plan .price small { font-size:.85rem; color: var(--text-muted); font-weight:500; }
     .plan ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
     .plan li { display:flex; gap:10px; color: var(--text-primary); font-size:.92rem; line-height:1.45; }
-    .plan li::before { content:"✓"; color:#22c55e; font-weight:700; }
+    .plan li.disabled { color: var(--text-muted); text-decoration: line-through; }
+    .plan li.disabled::before { content:"✕"; color:#f87171; font-weight:700; }
+    .plan li:not(.disabled)::before { content:"✓"; color:#22c55e; font-weight:700; }
     .plan .cta { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
     .subscription-card { margin-top:10px; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius:18px; padding:22px; }
     .subscription-card h3 { margin-bottom:10px; }
@@ -30,6 +32,12 @@
     .status-chip .value { font-weight:700; }
     .form-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:14px; }
     @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+    .featured { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom:22px; }
+    .feature { background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius:16px; padding:18px; }
+    .feature h4 { margin-bottom:8px; font-size:1rem; }
+    .feature p { color: var(--text-muted); font-size:.88rem; line-height:1.5; }
+    .trust { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; color: var(--text-muted); font-size:.85rem; }
+    .trust span { display:inline-flex; align-items:center; gap:6px; }
   </style>
 </head>
 <body>
@@ -48,9 +56,33 @@
       <div>
         <div class="hero-badge">Discovery+</div>
         <h1>Sube más, destaca más,<br><span>comparte sin límites</span></h1>
-        <p class="plus-sub">Compara tu plan actual con Discovery+ y elige la opción que mejor se adapte a tu ritmo de creación.</p>
+        <p class="plus-sub">Evoluciona tu experiencia con más almacenamiento, beneficios exclusivos y prioridad en la plataforma.</p>
+        <div class="trust" style="margin-top:14px">
+          <span>🔒 Pago seguro</span>
+          <span>👤 Para creadores</span>
+          <span>⚡ Activación tras aprobación</span>
+        </div>
       </div>
     </section>
+
+    <div class="featured">
+      <div class="feature">
+        <h4>💾 5 MB por creación</h4>
+        <p>Olvídate de recortar código. Sube proyectos más grandes con assets, estilos y scripts integrados.</p>
+      </div>
+      <div class="feature">
+        <h4>🛡️ Badge exclusivo</h4>
+        <p>Distínguete con un badge visible en tu perfil y en tus creaciones.</p>
+      </div>
+      <div class="feature">
+        <h4>⏱️ Ping 24h</h4>
+        <p>Recibe actualizaciones, recordatorios y métricas diarias para mantener tu perfil activo.</p>
+      </div>
+      <div class="feature">
+        <h4>⚡ Aprobación rápida</h4>
+        <p>Un moderador revisa tu solicitud y activa tu acceso en el menor tiempo posible.</p>
+      </div>
+    </div>
 
     <div class="plans">
       <div class="plan">
@@ -58,9 +90,10 @@
         <div class="price">0 € <small>/mes</small></div>
         <ul>
           <li>1 MB por creación</li>
-          <li>Badge básico en perfil</li>
-          <li>Soporte por comunidad</li>
-          <li>Ping estándar</li>
+          <li>Badge básico</li>
+          <li>Soporte comunitario</li>
+          <li class="disabled">Ping 24h</li>
+          <li class="disabled">Almacenamiento ampliado</li>
         </ul>
         <div class="cta">
           <span class="btn btn-outline" style="justify-content:center">Plan actual</span>
@@ -73,8 +106,9 @@
         <ul>
           <li>5 MB por creación</li>
           <li>Badge exclusivo Discovery+</li>
-          <li>Ping 24h y beneficios extra</li>
-          <li>Solicitud de aprobación rápida</li>
+          <li>Ping 24h y métricas diarias</li>
+          <li>Aprobación rápida</li>
+          <li>Prioridad en soporte</li>
         </ul>
         <div class="cta">
           <button class="btn btn-primary" id="openBuyBtn" style="justify-content:center">Suscribirme a Discovery+</button>
@@ -84,6 +118,7 @@
 
     <div class="subscription-card" id="subscriptionCard">
       <h3>Tu suscripción</h3>
+      <p style="color:var(--text-muted);margin-bottom:10px">Gestiona tu acceso y solicita Discovery+ en unos clics.</p>
       <div class="status-row">
         <div class="status-chip"><span class="label">Estado</span><div class="value" id="plusStatus">No activa</div></div>
         <div class="status-chip"><span class="label">Límite</span><div class="value" id="plusLimit">1 MB</div></div>
@@ -157,11 +192,12 @@
           openBtn.disabled = true;
           openBtn.style.opacity = '0.6';
         } else {
-          statusEl.textContent = 'No activa';
+          const isPending = data && data.status === 'pending';
+          statusEl.textContent = isPending ? 'Pendiente' : 'No activa';
           limitEl.textContent = '1 MB';
-          openBtn.textContent = 'Suscribirme a Discovery+';
-          openBtn.disabled = false;
-          openBtn.style.opacity = '1';
+          openBtn.textContent = isPending ? 'Solicitud enviada' : 'Suscribirme a Discovery+';
+          openBtn.disabled = isPending;
+          openBtn.style.opacity = isPending ? '0.6' : '1';
         }
       } catch {
         statusEl.textContent = 'No activa';
