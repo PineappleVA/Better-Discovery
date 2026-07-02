@@ -13,14 +13,18 @@
     .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
     .toolbar input, .toolbar select { background: rgba(20,20,26,.9); border:1px solid var(--border); color: var(--text-primary); padding:10px 12px; border-radius:10px; font-size:.9rem; outline:none; }
     .toolbar input:focus, .toolbar select:focus { border-color: var(--accent); }
+    .bulk-actions { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
     .tabs { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
     .tab { padding:8px 14px; border-radius:10px; border:1px solid var(--border); background: var(--bg-card); color: var(--text-primary); cursor:pointer; font:inherit; font-size:.88rem; font-weight:500; transition: border-color .2s, color .2s, background .2s; }
     .tab:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
     .tab.active { border-color: var(--accent); color:#fff; background: var(--grad-1); }
-    .snippet-row { display:grid; grid-template-columns: 1fr auto auto auto auto; gap: 14px; align-items: center; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; transition: border-color .2s; }
+    .snippet-row { display:grid; grid-template-columns: 40px 1fr auto auto auto auto auto; gap: 14px; align-items: center; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; transition: border-color .2s; }
     .snippet-row:hover { border-color: var(--accent); }
     .snippet-row .title { font-weight: 600; }
     .snippet-row .meta { color: var(--text-muted); font-size: .85rem; }
+    .select-all { display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:.85rem; color: var(--text-muted); }
+    .row-check { display:flex; align-items:center; justify-content:center; }
+    .select-all { display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:.85rem; color: var(--text-muted); }
     .empty-state { text-align: center; padding: 44px 12px; color: var(--text-muted); }
     .empty-state h3 { color: var(--text-primary); margin-bottom: 8px; }
     .edit-panel { display:none; margin-top: 10px; padding: 14px; background: rgba(99,102,241,.08); border:1px solid rgba(99,102,241,.25); border-radius: 12px; }
@@ -78,6 +82,32 @@
           <option value="title">Alfabéticamente</option>
         </select>
         <button class="btn btn-primary" id="refreshBtn">⟳ Actualizar</button>
+      </div>
+      <div class="bulk-actions" id="bulkActions" style="display:none">
+        <button class="btn btn-outline" id="bulkDeleteBtn">🗑 Eliminar seleccionados</button>
+        <select id="bulkTagSelect" class="form-input" style="padding:10px 12px; background:rgba(20,20,26,.9); border:1px solid var(--border); color:var(--text-primary); border-radius:10px;">
+          <option value="">Cambiar categoría…</option>
+          <option value="game">🎮 Juego</option>
+          <option value="art">🎨 Arte</option>
+          <option value="tool">🛠️ Herramienta</option>
+          <option value="demo">📐 Demo</option>
+          <option value="interactive">🖱️ Interactivo</option>
+          <option value="other">📦 Otro</option>
+        </select>
+        <button class="btn btn-outline" id="bulkClearBtn">Cancelar selección</button>
+      </div>
+      <div class="bulk-actions" id="bulkActions" style="display:none">
+        <button class="btn btn-outline" id="bulkDeleteBtn">🗑 Eliminar seleccionados</button>
+        <select id="bulkTagSelect" class="form-input" style="padding:10px 12px; background:rgba(20,20,26,.9); border:1px solid var(--border); color:var(--text-primary); border-radius:10px;">
+          <option value="">Cambiar categoría…</option>
+          <option value="game">🎮 Juego</option>
+          <option value="art">🎨 Arte</option>
+          <option value="tool">🛠️ Herramienta</option>
+          <option value="demo">📐 Demo</option>
+          <option value="interactive">🖱️ Interactivo</option>
+          <option value="other">📦 Otro</option>
+        </select>
+        <button class="btn btn-outline" id="bulkClearBtn">Cancelar selección</button>
       </div>
     </div>
 
@@ -430,6 +460,7 @@
         const sizeLabel = bytesToSize(bytes);
         return `
           <div class="snippet-row" data-id="${escapeHtml(s.id)}">
+            <div class="row-check"><input type="checkbox" class="snippet-check" value="${escapeHtml(s.id)}" data-check-id="${escapeHtml(s.id)}"></div>
             <div style="min-width:0">
               <div class="title">${escapeHtml(s.title)}</div>
               <div class="meta">${escapeHtml(author)} · ${formatDate(s.created_at)} · ❤️ ${s.likes ?? 0} ${s.tag ? '· 🏷️ ' + escapeHtml(s.tag) : ''} · 📦 ${sizeLabel}</div>
@@ -439,6 +470,12 @@
                     <label class="form-label" for="edit-title-${escapeHtml(s.id)}">Título</label>
                     <input id="edit-title-${escapeHtml(s.id)}" class="form-input" type="text" value="${escapeHtml(s.title)}">
                   </div>
+                  <div class="form-group">
+                    <label class="form-label" for="edit-likes-${escapeHtml(s.id)}">Likes</label>
+                    <input id="edit-likes-${escapeHtml(s.id)}" class="form-input" type="number" min="0" value="${s.likes ?? 0}">
+                  </div>
+                </div>
+                <div class="form-row" style="margin-top:10px">
                   <div class="form-group">
                     <label class="form-label" for="edit-tag-${escapeHtml(s.id)}">Categoría</label>
                     <select id="edit-tag-${escapeHtml(s.id)}" class="form-input">
@@ -451,14 +488,14 @@
                       <option value="other" ${s.tag==='other'?'selected':''}>📦 Otro</option>
                     </select>
                   </div>
+                  <div class="form-group">
+                    <label class="form-label" for="edit-author-${escapeHtml(s.id)}">Autor</label>
+                    <input id="edit-author-${escapeHtml(s.id)}" class="form-input" type="text" value="${escapeHtml(author)}">
+                  </div>
                 </div>
                 <div class="form-group" style="margin-top:10px">
                   <label class="form-label" for="edit-desc-${escapeHtml(s.id)}">Descripción</label>
                   <textarea id="edit-desc-${escapeHtml(s.id)}" class="form-textarea" maxlength="500" rows="2">${escapeHtml(s.description || '')}</textarea>
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="edit-author-${escapeHtml(s.id)}">Autor</label>
-                  <input id="edit-author-${escapeHtml(s.id)}" class="form-input" type="text" value="${escapeHtml(author)}">
                 </div>
                 <div class="form-group">
                   <label class="form-label" for="edit-html-${escapeHtml(s.id)}">HTML</label>
@@ -544,13 +581,15 @@
       const author = document.getElementById(`edit-author-${id}`).value.trim();
       const tag = document.getElementById(`edit-tag-${id}`).value || null;
       const html_content = document.getElementById(`edit-html-${id}`).value;
+      const likesRaw = document.getElementById(`edit-likes-${id}`).value;
+      const likes = Math.max(0, parseInt(likesRaw || '0', 10));
 
       if (!title) { showToast('El título no puede estar vacío.', 'error'); return; }
 
       try {
         const { error } = await supabaseClient
           .from('snippets')
-          .update({ title, description, author, tag, html_content })
+          .update({ title, description, author, tag, html_content, likes })
           .eq('id', id);
 
         if (error) throw error;
@@ -577,6 +616,44 @@
       }
     }
 
+    async function bulkDelete() {
+      const checked = Array.from(document.querySelectorAll('.snippet-check:checked')).map(cb => cb.value);
+      if (!checked.length) return;
+      if (!confirm(`¿Eliminar ${checked.length} creaciones? Esta acción no se puede deshacer.`)) return;
+      try {
+        const { error } = await supabaseClient
+          .from('snippets')
+          .delete()
+          .in('id', checked);
+        if (error) throw error;
+        showToast(`${checked.length} creaciones eliminadas.`, 'success');
+        document.querySelectorAll('.snippet-check').forEach(cb => cb.checked = false);
+        document.getElementById('bulkActions').style.display = 'none';
+        await loadAll();
+      } catch (err) {
+        showToast('Error al eliminar: ' + err.message, 'error', 5000);
+      }
+    }
+
+    async function bulkTag() {
+      const checked = Array.from(document.querySelectorAll('.snippet-check:checked')).map(cb => cb.value);
+      const tag = document.getElementById('bulkTagSelect').value;
+      if (!checked.length || !tag) return;
+      try {
+        const { error } = await supabaseClient
+          .from('snippets')
+          .update({ tag })
+          .in('id', checked);
+        if (error) throw error;
+        showToast(`Categoría actualizada en ${checked.length} creaciones.`, 'success');
+        document.querySelectorAll('.snippet-check').forEach(cb => cb.checked = false);
+        document.getElementById('bulkActions').style.display = 'none';
+        await loadAll();
+      } catch (err) {
+        showToast('Error al actualizar: ' + err.message, 'error', 5000);
+      }
+    }
+
     async function initPage() {
       await requireAuth({ redirect: false });
       await renderAuthNav();
@@ -596,6 +673,18 @@
       document.getElementById('searchInput')?.addEventListener('input', () => applyFilters());
       document.getElementById('tagFilter')?.addEventListener('change', () => applyFilters());
       document.getElementById('sortSelect')?.addEventListener('change', () => applyFilters());
+      document.getElementById('bulkDeleteBtn')?.addEventListener('click', bulkDelete);
+      document.getElementById('bulkClearBtn')?.addEventListener('click', () => {
+        document.querySelectorAll('.snippet-check').forEach(cb => cb.checked = false);
+        document.getElementById('bulkActions').style.display = 'none';
+      });
+      document.getElementById('bulkTagSelect')?.addEventListener('change', () => { if (document.getElementById('bulkTagSelect').value) bulkTag(); });
+      document.getElementById('modContent')?.addEventListener('change', (e) => {
+        if (e.target.classList.contains('snippet-check')) {
+          const checked = document.querySelectorAll('.snippet-check:checked');
+          document.getElementById('bulkActions').style.display = checked.length ? 'flex' : 'none';
+        }
+      });
       await loadAll();
       await loadSubRequests();
     }

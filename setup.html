@@ -110,6 +110,10 @@
     async function initSetup() {
       await requireAuth({ redirect: false });
       await renderAuthNav();
+      if (localStorage.getItem('bd_setup_done') === '1') {
+        window.location.replace('/Better-Discovery/index.html');
+        return;
+      }
       const profile = getProfileData();
       const name = document.getElementById('setupName');
       const bio = document.getElementById('setupBio');
@@ -126,6 +130,7 @@
       const avatar = document.getElementById('setupAvatar').value.trim() || getProfileInitial(name);
       const tag = document.getElementById('setupTag').value || null;
       saveProfileData({ displayName: name, bio, avatar, tag });
+      try { localStorage.setItem('bd_setup_done', '1'); } catch {}
       showToast('Perfil guardado.', 'success');
       window.location.href = '/Better-Discovery/index.html';
     });
