@@ -1,610 +1,96 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Moderación – Better Discovery</title>
-  <link rel="stylesheet" href="/Better-Discovery/css/style.css">
-  <style>
-    .mod-page { max-width: 1200px; margin: 0 auto; padding: 36px 24px 80px; animation: fadeUp .45s ease both; }
-    .mod-header { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:22px; flex-wrap:wrap; }
-    .mod-header h1 { font-size: clamp(1.7rem, 3vw, 2.4rem); letter-spacing: -.02em; }
-    .mod-status { color: var(--text-muted); font-size: .9rem; }
-    .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
-    .toolbar input, .toolbar select { background: rgba(20,20,26,.9); border:1px solid var(--border); color: var(--text-primary); padding:10px 12px; border-radius:10px; font-size:.9rem; outline:none; }
-    .toolbar input:focus, .toolbar select:focus { border-color: var(--accent); }
-    .tabs { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
-    .tab { padding:8px 14px; border-radius:10px; border:1px solid var(--border); background: var(--bg-card); color: var(--text-primary); cursor:pointer; font:inherit; font-size:.88rem; font-weight:500; transition: border-color .2s, color .2s, background .2s; }
-    .tab:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
-    .tab.active { border-color: var(--accent); color:#fff; background: var(--grad-1); }
-    .snippet-row { display:grid; grid-template-columns: 1fr auto auto auto auto; gap: 14px; align-items: center; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; transition: border-color .2s; }
-    .snippet-row:hover { border-color: var(--accent); }
-    .snippet-row .title { font-weight: 600; }
-    .snippet-row .meta { color: var(--text-muted); font-size: .85rem; }
-    .empty-state { text-align: center; padding: 44px 12px; color: var(--text-muted); }
-    .empty-state h3 { color: var(--text-primary); margin-bottom: 8px; }
-    .edit-panel { display:none; margin-top: 10px; padding: 14px; background: rgba(99,102,241,.08); border:1px solid rgba(99,102,241,.25); border-radius: 12px; }
-    .edit-panel .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .edit-panel textarea { font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace; font-size: .84rem; min-height: 220px; }
-    .row-actions { display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; margin-top:12px; }
-    .badge { display:inline-flex; align-items:center; gap:6px; background: rgba(99,102,241,.15); border:1px solid rgba(99,102,241,.35); color:#c7d2fe; padding:3px 8px; border-radius:999px; font-size:.78rem; }
-    .stat { color: var(--text-muted); font-size:.82rem; }
-    .req-row { display:grid; grid-template-columns: 1fr auto auto auto; gap: 14px; align-items: center; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
-    .req-row .meta { color: var(--text-muted); font-size: .85rem; }
-    .log-row { display:grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: start; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
-    .log-row pre { margin:0; white-space:pre-wrap; word-break:break-word; color:#e5e7eb; font-size:.82rem; background:#0b0b0f; border:1px solid var(--border); border-radius:10px; padding:10px; }
-    .chat-row { display:grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: start; background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
-    .chat-bubble { display:flex; flex-direction:column; gap:4px; }
-    .chat-bubble .who { font-weight:600; font-size:.85rem; color:#fff; }
-    .chat-bubble .what { color:#e5e7eb; font-size:.82rem; background:#0b0b0f; border:1px solid var(--border); border-radius:10px; padding:10px; }
-    .sub-card { background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%); border:1px solid var(--border); border-radius: 14px; padding: 16px; }
-  </style>
-</head>
-<body>
-  <nav>
-    <a href="/Better-Discovery/index.html" class="nav-logo">🚀 Better Discovery</a>
-    <div class="nav-links">
-      <a href="/Better-Discovery/index.html">Explorar</a>
-      <a href="/Better-Discovery/about.html">Acerca de</a>
-      <a href="/Better-Discovery/mod.html" class="btn btn-primary">Mod</a>
-    </div>
-    <div class="nav-auth" id="navAuth"></div>
-  </nav>
-
-  <main class="mod-page">
-    <div class="plus-banner">
-      <div class="plus-text">🧭 Gestiona suscripciones <span>Discovery+</span>, solicitudes pendientes y beneficios de creadores.</div>
-      <a class="btn btn-primary" href="/Better-Discovery/discovery-plus.html">Ver planes</a>
-    </div>
-    <div class="mod-header">
-      <div>
-        <h1>Panel de moderación</h1>
-        <div class="mod-status" id="modStatus">Comprobando permisos…</div>
-      </div>
-      <div class="toolbar">
-        <input type="search" id="searchInput" placeholder="Buscar por título o autor…" />
-        <select id="tagFilter">
-          <option value="">Todas las categorías</option>
-          <option value="game">🎮 Juego</option>
-          <option value="art">🎨 Arte</option>
-          <option value="tool">🛠️ Herramienta</option>
-          <option value="demo">📐 Demo</option>
-          <option value="interactive">🖱️ Interactivo</option>
-          <option value="other">📦 Otro</option>
-        </select>
-        <select id="sortSelect">
-          <option value="created_at">Más recientes</option>
-          <option value="likes">Más valoradas</option>
-          <option value="title">Alfabéticamente</option>
-        </select>
-        <button class="btn btn-primary" id="refreshBtn">⟳ Actualizar</button>
-      </div>
-    </div>
-
-    <div class="tabs">
-      <button class="tab active" data-tab="creations">✨ Creaciones</button>
-      <button class="tab" data-tab="requests">🛡️ Solicitudes Discovery+</button>
-      <button class="tab" data-tab="logs">📋 Logs</button>
-      <button class="tab" data-tab="chat">💬 Chat soporte</button>
-      <button class="tab" data-tab="subscriptions">📦 Suscripciones activas</button>
-    </div>
-
-    <section id="tab-creations">
-      <h2 style="font-size:1.1rem;margin-bottom:10px">✨ Creaciones</h2>
-      <div id="modContent"></div>
-      <div id="pagination" class="pagination" style="margin-top:16px"></div>
-    </section>
-
-    <section id="tab-requests" style="display:none">
-      <h2 style="font-size:1.1rem;margin-bottom:10px">🛡️ Solicitudes Discovery+</h2>
-      <div id="modSubs"></div>
-    </section>
-
-    <section id="tab-logs" style="display:none">
-      <h2 style="font-size:1.1rem;margin-bottom:10px">📋 Logs de errores</h2>
-      <div id="modLogs"></div>
-    </section>
-
-    <section id="tab-chat" style="display:none">
-      <h2 style="font-size:1.1rem;margin-bottom:10px">💬 Chat soporte</h2>
-      <div id="modChat"></div>
-    </section>
-
-    <section id="tab-subscriptions" style="display:none">
-      <h2 style="font-size:1.1rem;margin-bottom:10px">📦 Suscripciones Discovery+ activas</h2>
-      <div id="modActiveSubs"></div>
-    </section>
-
-    <div id="toastAnchor" aria-live="polite"></div>
-  </main>
-
-  <footer class="site-footer">
-    <a href="/Better-Discovery/terms.html">Términos y condiciones</a>
-    <span>·</span>
-    <a href="/Better-Discovery/privacy.html">Política de privacidad</a>
-  </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="/Better-Discovery/js/config.js"></script>
-  <script src="/Better-Discovery/js/app.js"></script>
-  <script>
-    let snippets = [];
-    let filtered = [];
-    let page = 0;
-    const PER_PAGE = 12;
-    let currentSort = 'created_at';
-    let currentTag = '';
-    let currentQuery = '';
-
-    function switchTab(name) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.getAttribute('data-tab') === name));
-      ['creations','requests','logs','chat','subscriptions'].forEach(id => {
-        const el = document.getElementById('tab-' + id);
-        if (el) el.style.display = id === name ? '' : 'none';
-      });
-      if (name === 'requests') loadSubRequests();
-      if (name === 'logs') loadLogs();
-      if (name === 'chat') loadChat();
-      if (name === 'subscriptions') loadActiveSubs();
-    }
-
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.addEventListener('click', () => switchTab(tab.getAttribute('data-tab')));
-    });
-
-    async function loadAll() {
-      const content = document.getElementById('modContent');
-      const status = document.getElementById('modStatus');
-      status.textContent = 'Cargando…';
-      if (!IS_CONFIGURED || !supabaseClient) {
-        content.innerHTML = configNoticeHtml();
-        status.textContent = 'Sin configuración.';
-        return;
-      }
-
-      try {
-        let q = supabaseClient
-          .from('snippets')
-          .select('id, title, description, author, created_at, likes, tag, html_content', { count: 'exact' })
-          .order(currentSort, { ascending: currentSort === 'title' ? true : false });
-
-        if (currentTag) q = q.eq('tag', currentTag);
-        if (currentQuery) q = q.or(`title.ilike.%${currentQuery}%,description.ilike.%${currentQuery}%,author.ilike.%${currentQuery}%`);
-
-        const start = page * PER_PAGE;
-        const end = start + PER_PAGE - 1;
-        const { data, error, count } = await q.range(start, end);
-
-        if (error) throw error;
-        snippets = Array.isArray(data) ? data : [];
-        status.textContent = `${count ?? 0} creaciones`;
-        renderList();
-        renderPagination(count ?? 0);
-      } catch (err) {
-        content.innerHTML = `<div class="empty-state"><h3>No se pudo cargar</h3><p>Revisa la conexión con Supabase.</p></div>`;
-        status.textContent = 'Error';
-      }
-    }
-
-    function applyFilters() {
-      page = 0;
-      currentQuery = (document.getElementById('searchInput')?.value || '').trim();
-      currentTag = (document.getElementById('tagFilter')?.value || '').trim();
-      currentSort = document.getElementById('sortSelect')?.value || 'created_at';
-      loadAll();
-    }
-
-    async function loadSubRequests() {
-      const container = document.getElementById('modSubs');
+    async function loadModTickets() {
+      const container = document.getElementById('modTickets');
       if (!container) return;
-      if (!IS_CONFIGURED || !supabaseClient) {
-        container.innerHTML = configNoticeHtml();
-        return;
-      }
+      if (!IS_CONFIGURED || !supabaseClient) { container.innerHTML = configNoticeHtml(); return; }
       try {
-        const { data, error } = await supabaseClient
-          .from('subscription_requests')
-          .select('id, user_email, status, created_at, approved_by')
-          .eq('status', 'pending')
-          .order('created_at', { ascending: true });
+        const { data, error } = await supabaseClient.from('support_tickets').select('id, user_email, subject, status, created_at').order('created_at', { ascending: false });
         if (error) throw error;
         const items = Array.isArray(data) ? data : [];
-        if (!items.length) {
-          container.innerHTML = '<div class="empty-state"><h3>Sin solicitudes pendientes</h3><p>Cuando alguien solicite Discovery+ aparecerá aquí.</p></div>';
-          return;
-        }
-        container.innerHTML = '<div style="display:flex; flex-direction:column; gap:14px">' + items.map(r => `
-          <div class="req-row" data-id="${escapeHtml(r.id)}">
-            <div>
-              <div class="title">${escapeHtml(r.user_email)}</div>
-              <div class="meta">${escapeHtml(r.approved_by || 'Sin nota')} · ${formatDate(r.created_at)}</div>
+        if (!items.length) { container.innerHTML = '<div class="empty-state"><h3>Sin tickets</h3></div>'; return; }
+        container.innerHTML = '<div style="display:flex; flex-direction:column; gap:14px">' + items.map(t => `
+          <div class="ticket-card">
+            <div class="ticket-header">
+              <div class="ticket-title">${escapeHtml(t.subject)}</div>
+              <span class="ticket-status ${t.status}">${t.status === 'open' ? 'Abierto' : 'Cerrado'}</span>
             </div>
-            <div class="stat"><span class="badge">Pendiente</span></div>
-            <div style="display:flex; gap:8px; justify-content:flex-end;">
-              <button class="btn btn-primary" data-approve="${escapeHtml(r.id)}" data-email="${escapeHtml(r.user_email)}">Aprobar</button>
-              <button class="btn btn-outline" data-reject="${escapeHtml(r.id)}" style="border-color:rgba(239,68,68,.35);color:#f87171">Rechazar</button>
+            <div class="ticket-meta">${escapeHtml(t.user_email)} · ${formatDate(t.created_at)}</div>
+            <div style="display:flex; gap:8px; margin-top:10px;">
+              <button class="btn btn-outline" data-open-mod-ticket="${escapeHtml(t.id)}">Abrir chat</button>
+              ${t.status === 'open' ? `<button class="btn btn-outline" data-close-mod-ticket="${escapeHtml(t.id)}">Cerrar ticket</button>` : ''}
             </div>
           </div>
         `).join('') + '</div>';
-
-        container.querySelectorAll('button[data-approve]').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            const id = btn.getAttribute('data-approve');
-            const email = btn.getAttribute('data-email');
-            await approveRequest(id, email);
-          });
-        });
-        container.querySelectorAll('button[data-reject]').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            const id = btn.getAttribute('data-reject');
-            await rejectRequest(id);
-          });
-        });
+        container.querySelectorAll('button[data-open-mod-ticket]').forEach(btn => btn.addEventListener('click', async () => { await openModTicketChat(btn.getAttribute('data-open-mod-ticket')); }));
+        container.querySelectorAll('button[data-close-mod-ticket]').forEach(btn => btn.addEventListener('click', async () => { await closeTicket(btn.getAttribute('data-close-mod-ticket'), getSessionEmail(await getSession())); }));
       } catch {
-        container.innerHTML = '<div class="empty-state"><h3>No se pudieron cargar las solicitudes</h3><p>Revisa la conexión con Supabase.</p></div>';
+        container.innerHTML = '<div class="empty-state"><h3>No se pudieron cargar los tickets</h3></div>';
       }
     }
 
-    async function approveRequest(id, email) {
+    async function openModTicketChat(id) {
+      currentTicketId = id;
+      const card = document.getElementById('ticketChatCard');
+      card.style.display = '';
       try {
-        const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-        const { error } = await supabaseClient
-          .from('subscription_requests')
-          .update({ status: 'approved', approved_at: new Date().toISOString() })
-          .eq('id', id);
-        if (error) throw error;
-        const { error: upErr } = await supabaseClient
-          .from('subscriptions')
-          .upsert({ user_email: email, plan: 'discovery_plus', status: 'active', expires_at: expiresAt, updated_at: new Date().toISOString() }, { onConflict: 'user_email' });
-        if (upErr) throw upErr;
-        showToast('Solicitud aprobada.', 'success');
-        await loadSubRequests();
-      } catch (err) {
-        showToast('Error al aprobar: ' + err.message, 'error', 5000);
+        const { data } = await supabaseClient.from('support_tickets').select('*').eq('id', id).maybeSingle();
+        if (!data) { showToast('Ticket no encontrado', 'error'); return; }
+        document.getElementById('chatTicketTitle').textContent = data.subject;
+        document.getElementById('chatTicketMeta').textContent = 'Creado: ' + formatDate(data.created_at);
+        const statusEl = document.getElementById('chatTicketStatus');
+        statusEl.textContent = data.status === 'open' ? 'Abierto' : 'Cerrado';
+        statusEl.className = 'ticket-status ' + data.status;
+        document.getElementById('chatInput').disabled = data.status === 'closed';
+        await loadMessages(id);
+      } catch {
+        showToast('No se pudo cargar el ticket', 'error');
       }
     }
 
-    async function rejectRequest(id) {
+    async function loadMessages(ticketId) {
+      const container = document.getElementById('chatMessages');
       try {
-        const { error } = await supabaseClient
-          .from('subscription_requests')
-          .update({ status: 'rejected' })
-          .eq('id', id);
-        if (error) throw error;
-        showToast('Solicitud rechazada.', 'info');
-        await loadSubRequests();
-      } catch (err) {
-        showToast('Error al rechazar: ' + err.message, 'error', 5000);
-      }
-    }
-
-    async function loadLogs() {
-      const container = document.getElementById('modLogs');
-      if (!container) return;
-      if (!IS_CONFIGURED || !supabaseClient) {
-        container.innerHTML = configNoticeHtml();
-        return;
-      }
-      try {
-        const { data, error } = await supabaseClient
-          .from('error_logs')
-          .select('id, message, stack, url, created_at')
-          .order('created_at', { ascending: false })
-          .limit(50);
+        const { data, error } = await supabaseClient.from('support_messages').select('id, email, message, created_at').eq('ticket_id', ticketId).order('created_at', { ascending: true });
         if (error) throw error;
         const items = Array.isArray(data) ? data : [];
-        if (!items.length) {
-          container.innerHTML = '<div class="empty-state"><h3>Sin logs</h3><p>Aún no hay errores registrados.</p></div>';
-          return;
-        }
-        container.innerHTML = '<div style="display:flex; flex-direction:column; gap:14px">' + items.map(log => `
-          <div class="log-row">
-            <div>
-              <div class="title">${escapeHtml(log.message || 'Error')}</div>
-              <pre>${escapeHtml(log.stack || '')}</pre>
-              <div class="meta">${escapeHtml(log.url || '')} · ${formatDate(log.created_at)}</div>
-            </div>
-            <div style="display:flex; gap:8px;">
-              <button class="btn btn-outline" data-copy-log="${escapeHtml(log.id)}">📋 Copiar</button>
-              <button class="btn btn-outline" data-clear-log="${escapeHtml(log.id)}" style="border-color:rgba(239,68,68,.35);color:#f87171">🗑 Borrar</button>
-            </div>
+        container.innerHTML = items.map(msg => `
+          <div class="chat-bubble">
+            <div class="who">${escapeHtml(msg.email || 'Anónimo')}</div>
+            <div class="what">${escapeHtml(msg.message)}</div>
+            <div class="when">${formatDate(msg.created_at)}</div>
           </div>
-        `).join('') + '</div>';
-        container.querySelectorAll('button[data-copy-log]').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            const id = btn.getAttribute('data-copy-log');
-            const log = items.find(i => i.id === id);
-            if (!log) return;
-            await navigator.clipboard.writeText(`${log.message}\n\n${log.stack}\n${log.url}\n${log.created_at}`);
-            showToast('Log copiado.', 'success');
-          });
-        });
-        container.querySelectorAll('button[data-clear-log]').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            const id = btn.getAttribute('data-clear-log');
-            await clearLog(id);
-          });
-        });
+        `).join('');
+        container.scrollTop = container.scrollHeight;
       } catch {
-        container.innerHTML = '<div class="empty-state"><h3>No se pudieron cargar los logs</h3><p>Revisa la conexión con Supabase.</p></div>';
+        container.innerHTML = '<div class="empty-state" style="padding:24px"><h3>No se pudieron cargar los mensajes</h3></div>';
       }
     }
 
-    async function clearLog(id) {
+    async function closeTicket(ticketId, closedBy) {
       try {
-        const { error } = await supabaseClient
-          .from('error_logs')
-          .delete()
-          .eq('id', id);
-        if (error) throw error;
-        showToast('Log eliminado.', 'info');
-        await loadLogs();
-      } catch (err) {
-        showToast('Error al borrar log: ' + err.message, 'error', 5000);
-      }
-    }
-
-    async function loadChat() {
-      const container = document.getElementById('modChat');
-      if (!container) return;
-      if (!IS_CONFIGURED || !supabaseClient) {
-        container.innerHTML = configNoticeHtml();
-        return;
-      }
-      try {
-        const { data, error } = await supabaseClient
-          .from('support_messages')
-          .select('id, email, message, created_at')
-          .order('created_at', { ascending: true });
-        if (error) throw error;
-        const items = Array.isArray(data) ? data : [];
-        if (!items.length) {
-          container.innerHTML = '<div class="empty-state"><h3>Sin mensajes</h3><p>Aún no hay mensajes de soporte.</p></div>';
-          return;
-        }
-        container.innerHTML = '<div style="display:flex; flex-direction:column; gap:14px">' + items.map(msg => `
-          <div class="chat-row">
-            <div class="chat-bubble">
-              <div class="who">${escapeHtml(msg.email || 'Anónimo')}</div>
-              <div class="what">${escapeHtml(msg.message)}</div>
-              <div class="meta">${formatDate(msg.created_at)}</div>
-            </div>
-            <button class="btn btn-outline" data-reply="${escapeHtml(msg.id)}">Responder</button>
-          </div>
-        `).join('') + '</div>';
-        container.querySelectorAll('button[data-reply]').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            const id = btn.getAttribute('data-reply');
-            const text = prompt('Respuesta de soporte:');
-            if (!text) return;
-            await supabaseClient.from('support_messages').insert([{ id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`, email: 'soporte', message: `[Soporte] ${text}`, parent_id: id }]);
-            showToast('Respuesta enviada.', 'success');
-            await loadChat();
-          });
-        });
+        const { data } = await supabaseClient.from('support_tickets').select('*').eq('id', ticketId).maybeSingle();
+        if (!data || data.status === 'closed') return;
+        const closedTicket = { ...data, closed_at: new Date().toISOString(), closed_by: closedBy };
+        const store = JSON.parse(localStorage.getItem('bd_closed_tickets') || '[]');
+        store.push(closedTicket);
+        localStorage.setItem('bd_closed_tickets', JSON.stringify(store));
+        await supabaseClient.from('support_messages').delete().eq('ticket_id', ticketId);
+        await supabaseClient.from('support_tickets').delete().eq('id', ticketId);
+        showToast('Ticket cerrado y guardado localmente.', 'success');
+        document.getElementById('ticketChatCard').style.display = 'none';
+        currentTicketId = null;
+        await loadModTickets();
       } catch {
-        container.innerHTML = '<div class="empty-state"><h3>No se pudo cargar el chat</h3><p>Revisa la conexión con Supabase.</p></div>';
+        showToast('No se pudo cerrar el ticket.', 'error', 5000);
       }
     }
 
-    async function loadActiveSubs() {
-      const container = document.getElementById('modActiveSubs');
-      if (!container) return;
-      if (!IS_CONFIGURED || !supabaseClient) {
-        container.innerHTML = configNoticeHtml();
-        return;
-      }
-      try {
-        const { data, error } = await supabaseClient
-          .from('subscriptions')
-          .select('user_email, plan, status, expires_at, updated_at')
-          .eq('status', 'active')
-          .order('updated_at', { ascending: false });
-        if (error) throw error;
-        const items = Array.isArray(data) ? data : [];
-        if (!items.length) {
-          container.innerHTML = '<div class="empty-state"><h3>Sin suscripciones activas</h3><p>Aún no hay suscripciones Discovery+ activas.</p></div>';
-          return;
-        }
-        container.innerHTML = '<div style="display:flex; flex-direction:column; gap:14px">' + items.map(sub => `
-          <div class="sub-card">
-            <div class="title">${escapeHtml(sub.user_email)}</div>
-            <div class="meta">Plan: ${escapeHtml(sub.plan)} · Expira: ${sub.expires_at ? formatDate(sub.expires_at) : '—'} · Actualizado: ${formatDate(sub.updated_at)}</div>
-          </div>
-        `).join('') + '</div>';
-      } catch {
-        container.innerHTML = '<div class="empty-state"><h3>No se pudieron cargar las suscripciones</h3><p>Revisa la conexión con Supabase.</p></div>';
-      }
+    async function maybeAutoCloseTicket(ticketId, createdAt) {
+      const created = new Date(createdAt).getTime();
+      const elapsed = Date.now() - created;
+      const remaining = (6 * 60 * 60 * 1000) - elapsed;
+      if (remaining <= 0) { await closeTicket(ticketId, 'system'); return; }
+      setTimeout(async () => {
+        const { data } = await supabaseClient.from('support_tickets').select('status').eq('id', ticketId).maybeSingle();
+        if (data && data.status === 'open') await closeTicket(ticketId, 'system');
+      }, Math.max(remaining, 1000));
     }
-
-    function renderList() {
-      const content = document.getElementById('modContent');
-      if (!snippets.length) {
-        content.innerHTML = `<div class="empty-state"><h3>Aún no hay creaciones</h3><p>Cuando haya contenido aparecerá aquí.</p></div>`;
-        return;
-      }
-
-      content.innerHTML = `<div style="display:flex; flex-direction:column; gap:14px">` + snippets.map((s, idx) => {
-        const author = s.author || DEFAULT_AUTHOR_NAME;
-        const bytes = snippetBytes(s);
-        const sizeLabel = bytesToSize(bytes);
-        return `
-          <div class="snippet-row" data-id="${escapeHtml(s.id)}">
-            <div style="min-width:0">
-              <div class="title">${escapeHtml(s.title)}</div>
-              <div class="meta">${escapeHtml(author)} · ${formatDate(s.created_at)} · ❤️ ${s.likes ?? 0} ${s.tag ? '· 🏷️ ' + escapeHtml(s.tag) : ''} · 📦 ${sizeLabel}</div>
-              <div class="edit-panel" id="edit-${escapeHtml(s.id)}">
-                <div class="form-row">
-                  <div class="form-group">
-                    <label class="form-label" for="edit-title-${escapeHtml(s.id)}">Título</label>
-                    <input id="edit-title-${escapeHtml(s.id)}" class="form-input" type="text" value="${escapeHtml(s.title)}">
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="edit-tag-${escapeHtml(s.id)}">Categoría</label>
-                    <select id="edit-tag-${escapeHtml(s.id)}" class="form-input">
-                      <option value="">— ninguna —</option>
-                      <option value="game" ${s.tag==='game'?'selected':''}>🎮 Juego</option>
-                      <option value="art" ${s.tag==='art'?'selected':''}>🎨 Arte</option>
-                      <option value="tool" ${s.tag==='tool'?'selected':''}>🛠️ Herramienta</option>
-                      <option value="demo" ${s.tag==='demo'?'selected':''}>📐 Demo</option>
-                      <option value="interactive" ${s.tag==='interactive'?'selected':''}>🖱️ Interactivo</option>
-                      <option value="other" ${s.tag==='other'?'selected':''}>📦 Otro</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group" style="margin-top:10px">
-                  <label class="form-label" for="edit-desc-${escapeHtml(s.id)}">Descripción</label>
-                  <textarea id="edit-desc-${escapeHtml(s.id)}" class="form-textarea" maxlength="500" rows="2">${escapeHtml(s.description || '')}</textarea>
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="edit-author-${escapeHtml(s.id)}">Autor</label>
-                  <input id="edit-author-${escapeHtml(s.id)}" class="form-input" type="text" value="${escapeHtml(author)}">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="edit-html-${escapeHtml(s.id)}">HTML</label>
-                  <textarea id="edit-html-${escapeHtml(s.id)}" class="form-textarea code-textarea" spellcheck="false">${escapeHtml(s.html_content || '')}</textarea>
-                </div>
-                <div class="row-actions">
-                  <button class="btn btn-outline" data-close="${escapeHtml(s.id)}">Cancelar</button>
-                  <button class="btn btn-primary" data-save="${escapeHtml(s.id)}">💾 Guardar</button>
-                </div>
-              </div>
-            </div>
-            <div class="stat">
-              <div>ID: ${escapeHtml(s.id)}</div>
-              <div style="margin-top:4px">${sizeLabel}</div>
-            </div>
-            <div style="display:flex; gap:8px; justify-content:flex-end;">
-              <a class="btn btn-outline" href="/Better-Discovery/view.html?id=${encodeURIComponent(s.id)}" target="_blank" rel="noopener">👁 Ver</a>
-              <button class="btn btn-outline" data-edit="${escapeHtml(s.id)}">✏️ Editar</button>
-              <button class="btn btn-outline" data-delete="${escapeHtml(s.id)}" style="border-color:rgba(239,68,68,.35);color:#f87171">🗑 Eliminar</button>
-            </div>
-          </div>
-        `;
-      }).join('') + `</div>`;
-
-      content.querySelectorAll('button[data-edit]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.getAttribute('data-edit');
-          const panel = document.getElementById(`edit-${id}`);
-          const isOpen = panel.style.display === 'block';
-          document.querySelectorAll('.edit-panel').forEach(p => p.style.display = 'none');
-          panel.style.display = isOpen ? 'none' : 'block';
-        });
-      });
-
-      content.querySelectorAll('button[data-close]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.getAttribute('data-close');
-          document.getElementById(`edit-${id}`).style.display = 'none';
-        });
-      });
-
-      content.querySelectorAll('button[data-save]').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          const id = btn.getAttribute('data-save');
-          await saveSnippetEdits(id);
-        });
-      });
-
-      content.querySelectorAll('button[data-delete]').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          const id = btn.getAttribute('data-delete');
-          await deleteSnippet(id);
-        });
-      });
-    }
-
-    function renderPagination(total) {
-      const pages = Math.ceil(total / PER_PAGE);
-      const el = document.getElementById('pagination');
-      if (pages <= 1) { el.innerHTML = ''; return; }
-      const parts = [];
-      if (page > 0) parts.push(`<button class="page-btn" onclick="goPage(${page - 1})">← Anterior</button>`);
-      const start = Math.max(0, page - 2);
-      const end = Math.min(pages - 1, page + 2);
-      if (start > 0) parts.push(`<button class="page-btn" onclick="goPage(0)">1</button><span style="color:var(--text-muted);padding:0 4px">…</span>`);
-      for (let i = start; i <= end; i++) {
-        parts.push(`<button class="page-btn ${i === page ? 'active' : ''}" onclick="goPage(${i})">${i + 1}</button>`);
-      }
-      if (end < pages - 1) parts.push(`<span style="color:var(--text-muted);padding:0 4px">…</span><button class="page-btn" onclick="goPage(${pages - 1})">${pages}</button>`);
-      if (page < pages - 1) parts.push(`<button class="page-btn" onclick="goPage(${page + 1})">Siguiente →</button>`);
-      el.innerHTML = parts.join('');
-    }
-
-    function goPage(p) {
-      page = p;
-      loadAll();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    async function saveSnippetEdits(id) {
-      const title = document.getElementById(`edit-title-${id}`).value.trim();
-      const description = document.getElementById(`edit-desc-${id}`).value.trim();
-      const author = document.getElementById(`edit-author-${id}`).value.trim();
-      const tag = document.getElementById(`edit-tag-${id}`).value || null;
-      const html_content = document.getElementById(`edit-html-${id}`).value;
-
-      if (!title) { showToast('El título no puede estar vacío.', 'error'); return; }
-
-      try {
-        const { error } = await supabaseClient
-          .from('snippets')
-          .update({ title, description, author, tag, html_content })
-          .eq('id', id);
-
-        if (error) throw error;
-        showToast('Cambios guardados.', 'success');
-        await loadAll();
-      } catch (err) {
-        showToast('Error al guardar: ' + err.message, 'error', 5000);
-      }
-    }
-
-    async function deleteSnippet(id) {
-      if (!confirm('¿Seguro que quieres eliminar esta creación? Esta acción no se puede deshacer.')) return;
-      try {
-        const { error } = await supabaseClient
-          .from('snippets')
-          .delete()
-          .eq('id', id);
-
-        if (error) throw error;
-        showToast('Creación eliminada.', 'success');
-        await loadAll();
-      } catch (err) {
-        showToast('No se pudo eliminar: ' + err.message, 'error', 5000);
-      }
-    }
-
-    async function initPage() {
-      await requireAuth({ redirect: false });
-      await renderAuthNav();
-
-      const session = await getSession();
-      currentSession = session;
-      const modStatus = document.getElementById('modStatus');
-
-      if (!session || !isModerator(session)) {
-        modStatus.textContent = 'Sin permisos de moderador.';
-        document.getElementById('modContent').innerHTML = `<div class="empty-state"><h3>Acceso restringido</h3><p>Esta zona es solo para moderadores.</p></div>`;
-        return;
-      }
-
-      modStatus.textContent = 'Moderador activo';
-      document.getElementById('modContent').innerHTML = '<div class="empty-state"><div class="spinner"></div>Cargando…</div>';
-      document.getElementById('searchInput')?.addEventListener('input', () => applyFilters());
-      document.getElementById('tagFilter')?.addEventListener('change', () => applyFilters());
-      document.getElementById('sortSelect')?.addEventListener('change', () => applyFilters());
-      await loadAll();
-      await loadSubRequests();
-    }
-
-    document.getElementById('refreshBtn').addEventListener('click', async () => {
-      await loadAll();
-      await loadSubRequests();
-    });
-    document.addEventListener('DOMContentLoaded', initPage);
-  </script>
-</body>
-</html>
