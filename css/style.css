@@ -985,6 +985,35 @@ nav {
   animation-delay: calc(var(--i, 0) * 45ms);
 }
 
+.snippet-card, .profile-card, .plan, .feature, .creation-card {
+  transition: transform .2s, border-color .2s, box-shadow .2s;
+}
+.snippet-card:hover, .profile-card:hover, .plan:hover, .feature:hover, .creation-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(99,102,241,.35);
+  box-shadow: var(--shadow);
+}
+
+.form-input, .form-textarea, .sort-select, .toolbar input, .toolbar select {
+  transition: border-color .2s, box-shadow .2s, transform .15s;
+}
+.form-input:focus, .form-textarea:focus, .sort-select:focus, .toolbar input:focus, .toolbar select:focus {
+  transform: translateY(-1px);
+}
+
+.btn {
+  transition: background .2s, transform .12s, box-shadow .2s, opacity .2s;
+}
+.btn:active { transform: translateY(0) scale(0.98); }
+
+.comment {
+  animation: fadeUp .35s ease both;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 /* ── Config notice ── */
 .config-notice {
   grid-column: 1 / -1;

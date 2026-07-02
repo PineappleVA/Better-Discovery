@@ -98,6 +98,16 @@ async function renderAuthNav() {
     await supabaseClient.auth.signOut();
     window.location.replace(LOGIN_PAGE);
   });
+
+  updateActiveNav();
+}
+
+function updateActiveNav() {
+  const path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    const href = link.getAttribute('href') || '';
+    link.classList.toggle('active', path.includes(href) && href !== '/Better-Discovery/index.html' ? path.includes(href.replace('/Better-Discovery/', '')) : path.endsWith('/Better-Discovery/index.html') && href.includes('index.html'));
+  });
 }
 
 /* ── Moderator actions ── */
@@ -181,12 +191,15 @@ function showToast(message, type = 'info', duration = 3500) {
   const el = document.createElement('div');
   el.className = `toast ${type}`;
   el.textContent = message;
+  el.style.animation = 'none';
+  el.offsetHeight;
+  el.style.animation = 'slideIn 0.25s ease';
   document.body.appendChild(el);
 
   setTimeout(() => {
     el.style.transition = 'opacity 0.3s, transform 0.3s';
-    el.style.opacity    = '0';
-    el.style.transform  = 'translateX(110%)';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(110%)';
     setTimeout(() => el.remove(), 320);
   }, duration);
 }
