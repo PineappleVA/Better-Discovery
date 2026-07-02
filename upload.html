@@ -73,6 +73,10 @@
       <input id="quickProfileName" class="form-input" type="text" maxlength="60" placeholder="Nombre público">
     </div>
     <form id="uploadForm" novalidate>
+      <div class="plus-banner">
+        <div class="plus-text">💡 Con <span>Discovery+</span> subes hasta <span>5 MB</span> por creación y obtienes badge exclusivo.</div>
+        <a class="btn btn-outline" href="/Better-Discovery/discovery-plus.html">Ver planes</a>
+      </div>
       <div class="form-group">
         <label class="form-label" for="title">Título <span class="hint">obligatorio</span></label>
         <input id="title" class="form-input" type="text" maxlength="120" placeholder="Mi increíble proyecto HTML" required>
@@ -208,7 +212,7 @@
         e.target.value = '';
         return;
       }
-      const validationError = validateHtmlDocument(htmlCode);
+      const validationError = validateHtmlDocument(text);
       if (validationError) { showToast(validationError, 'error'); e.target.value = ''; return; }
       document.getElementById('htmlCode').value = text;
       updateSizeIndicator();
@@ -247,7 +251,8 @@
       const validationError = validateHtmlDocument(htmlCode);
       if (validationError) { showToast(validationError, 'error'); document.getElementById('htmlCode').focus(); return; }
       const bytes = new TextEncoder().encode(htmlCode).length;
-      if (bytes > MAX_BYTES) { showToast('El HTML supera el límite de 1 MB.', 'error'); return; }
+      const maxBytes = getMaxUploadBytes ? getMaxUploadBytes() : MAX_BYTES;
+      if (bytes > maxBytes) { showToast(`El HTML supera el límite de ${bytesToSize(maxBytes)}.`, 'error'); return; }
       saveProfileData({ displayName: profileName, bio: getProfileData().bio });
       const btn = document.getElementById('submitBtn');
       const status = document.getElementById('submitStatus');

@@ -875,6 +875,50 @@ nav {
 .toast.error   { border-color: var(--danger);  color: var(--danger);  }
 .toast.info    { border-color: var(--accent);  }
 
+.discovery-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(90deg,#ff7a00,#ff4500);
+  color: #fff;
+  border: none;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(255,69,0,.25);
+}
+
+.limit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(99,102,241,.12);
+  color: #c7d2fe;
+  border: 1px solid rgba(99,102,241,.3);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.plus-banner {
+  max-width: 1100px;
+  margin: 18px auto;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(33,33,40,.95) 0, rgba(23,23,28,.95) 100%);
+  border: 1px solid rgba(255,69,0,.35);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.plus-banner .plus-text { color: var(--text-primary); font-size: .95rem; }
+.plus-banner .plus-text span { color: #ff7a00; font-weight: 700; }
+
 @keyframes slideIn {
   from { transform: translateX(110%); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
